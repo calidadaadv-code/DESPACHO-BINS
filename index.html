@@ -886,7 +886,9 @@
   // Quienes reciben las solicitudes de guía de despacho (salida de fruta)
   // Las solicitudes de guía se envían al grupo de WhatsApp de despacho
   // (WhatsApp no permite abrir un grupo con texto desde un link: se elige el grupo al compartir).
-  var WSP_GUIAS = [];
+  var WSP_GUIAS = [
+    { nombre:'Camilo Espinoza', numero:'56959544582' }
+  ];
 
   // Catastro de plantas y exportadoras (se reemplaza por la lista oficial)
   var PLANTAS = [];
@@ -1086,15 +1088,14 @@
     window.open(url, '_blank');
   }
   function pintarBotonesWsp(){
-    if(!WSP_GUIAS.length){
-      $('wsp-botones').innerHTML = '<button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="compartirGuia(\'\')">📲 Enviar al grupo de despacho</button>' +
-        '<p class="draft-note">Se abre WhatsApp con el mensaje listo: elige el grupo de despacho y envía.</p>';
-      return;
-    }
-    $('wsp-botones').innerHTML = WSP_GUIAS.map(function(c){
-      return '<button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="compartirGuia(\''+c.numero+'\')">📲 Enviar a '+esc(c.nombre)+'</button>';
+    var h = '<button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="compartirGuia(\'\')">📲 1 · Enviar al grupo de despacho</button>';
+    h += WSP_GUIAS.map(function(c, i){
+      return '<button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="compartirGuia(\''+c.numero+'\')">📲 '+(i+2)+' · Enviar a '+esc(c.nombre)+'</button>';
     }).join('');
+    h += '<p class="draft-note">En el grupo: se abre WhatsApp, elige el grupo de despacho y envía. Luego envíalo también a '+esc(WSP_GUIAS.map(function(c){return c.nombre;}).join(', '))+'.</p>';
+    $('wsp-botones').innerHTML = h;
   }
+
 
   function marcarEmitida(){
     if(!despachoActual || !sb) return;
