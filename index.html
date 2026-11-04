@@ -542,8 +542,7 @@
       <h2 class="ok-title" id="ok-title">Solicitud guardada</h2>
       <p class="ok-sub">Datos para emitir la guía de despacho</p>
       <div class="guia-card" id="guia-card"></div>
-      <p class="form-card-title" style="color:#8FD39B;margin-top:18px">Enviar solicitud por WhatsApp</p>
-      <div id="wsp-botones"></div>
+            <div id="wsp-botones"></div>
       <div class="form-card" id="emitir-card">
         <p class="form-card-title"><span>🧾</span>Guía SII</p>
         <div class="field">
@@ -885,10 +884,9 @@
   var WSP_DESTINO = '';
 
   // Quienes reciben las solicitudes de guía de despacho (salida de fruta)
-  var WSP_GUIAS = [
-    { nombre:'Camilo Espinoza', numero:'56959544582' },
-    { nombre:'Denisse Ovalle',  numero:'56964917098' }
-  ];
+  // Las solicitudes de guía se envían al grupo de WhatsApp de despacho
+  // (WhatsApp no permite abrir un grupo con texto desde un link: se elige el grupo al compartir).
+  var WSP_GUIAS = [];
 
   // Catastro de plantas y exportadoras (se reemplaza por la lista oficial)
   var PLANTAS = [];
@@ -1088,6 +1086,11 @@
     window.open(url, '_blank');
   }
   function pintarBotonesWsp(){
+    if(!WSP_GUIAS.length){
+      $('wsp-botones').innerHTML = '<button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="compartirGuia(\'\')">📲 Enviar al grupo de despacho</button>' +
+        '<p class="draft-note">Se abre WhatsApp con el mensaje listo: elige el grupo de despacho y envía.</p>';
+      return;
+    }
     $('wsp-botones').innerHTML = WSP_GUIAS.map(function(c){
       return '<button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="compartirGuia(\''+c.numero+'\')">📲 Enviar a '+esc(c.nombre)+'</button>';
     }).join('');
