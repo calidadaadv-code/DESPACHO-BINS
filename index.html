@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --teal-deep:   #123B4D;
@@ -294,6 +295,18 @@
   .cruce-tab .ok{ color:#235A34; } .cruce-tab .bad{ color:#fff; background:#E0623D; padding:2px 8px; border-radius:99px; }
   .cruce-nota{ margin:10px 0 0; font-size:13.5px; color:#9A2E14; font-weight:600; }
   .cruce-foto{ display:block; width:100%; max-height:280px; object-fit:contain; background:#EEE; border-radius:11px; margin-top:10px; }
+
+  /* ---------- Stock ---------- */
+  #view-stock .content{ padding:12px 20px 28px; display:flex; flex-direction:column; }
+  #view-stock .field label{ color:var(--ink); }
+  .stk-tab{ width:100%; border-collapse:collapse; font-size:14px; }
+  .stk-tab th{ font-family:'Space Grotesk',sans-serif; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal-mid); text-align:right; padding:4px 0 8px; }
+  .stk-tab th:first-child, .stk-tab td:first-child{ text-align:left; }
+  .stk-tab td{ text-align:right; padding:9px 0; border-top:1px solid rgba(20,33,28,0.07); font-family:'Space Grotesk',sans-serif; font-weight:600; }
+  .stk-tab td:first-child{ font-family:'Inter',sans-serif; font-weight:500; color:var(--ink-soft); }
+  .stk-tab .neg{ color:#B0381E; } .stk-tab .pos{ color:#235A34; }
+  .stk-tab tr.saldo td{ border-top:2px solid rgba(20,33,28,0.2); font-weight:700; font-size:15px; }
+  .stk-note{ margin:10px 0 0; font-size:12.5px; color:var(--ink-soft); }
 </style>
 </head>
 <body>
@@ -372,9 +385,9 @@
           <span class="option-text"><p class="option-title">Recepción de bins vacíos</p><p class="option-sub">Chofer + campo, con cruce y aviso de descuadre</p></span>
           <span class="option-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
         </button>
-        <button class="option-card option-card--vivid card-stk" type="button" onclick="abrirModulo('Stock de bins','Saldo de bins en el fundo: entradas menos salidas.')">
+        <button class="option-card option-card--vivid card-stk" type="button" onclick="abrirStock()">
           <span class="option-icon-vivid">📦</span>
-          <span class="option-text"><p class="option-title">Stock de bins</p><p class="option-sub">Saldo disponible en el fundo</p></span>
+          <span class="option-text"><p class="option-title">Stock de bins</p><p class="option-sub">Saldo y Excel de movimientos (− salidas / + entradas)</p></span>
           <span class="option-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
         </button>
         <button class="option-card option-card--vivid card-inf" type="button" onclick="abrirModulo('Informes','Resumen de despachos por día, cuartel y especie, descargable y para compartir.')">
@@ -529,7 +542,8 @@
       <h2 class="ok-title" id="ok-title">Solicitud guardada</h2>
       <p class="ok-sub">Datos para emitir la guía de despacho</p>
       <div class="guia-card" id="guia-card"></div>
-      <button class="btn-save btn-wsp" type="button" onclick="compartirGuia()">Enviar solicitud por WhatsApp</button>
+      <p class="form-card-title" style="color:#8FD39B;margin-top:18px">Enviar solicitud por WhatsApp</p>
+      <div id="wsp-botones"></div>
       <div class="form-card" id="emitir-card">
         <p class="form-card-title"><span>🧾</span>Guía SII</p>
         <div class="field">
@@ -790,6 +804,29 @@
     </div>
   </section>
 
+  <!-- ---------- PANTALLA: STOCK DE BINS / EXCEL ---------- -->
+  <section class="view" id="view-stock">
+    <div class="topbar">
+      <button class="btn-back" type="button" onclick="goTo('view-seleccion')" aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="topbar-label">Stock de bins</span>
+    </div>
+    <div class="content">
+      <h2 class="sel-heading">Movimientos de bins</h2>
+      <p class="sel-sub" style="margin-bottom:0">Salidas (despachos con fruta) en −, entradas (bins vacíos recibidos en campo) en +.</p>
+      <div class="form-card">
+        <p class="form-card-title"><span>📅</span>Periodo</p>
+        <div class="field-row">
+          <div class="field"><label for="s-desde">Desde</label><input type="date" id="s-desde"></div>
+          <div class="field"><label for="s-hasta">Hasta</label><input type="date" id="s-hasta"></div>
+        </div>
+        <button class="btn-save" type="button" id="btn-stock" onclick="cargarStock()">Ver saldo</button>
+      </div>
+      <div id="stock-res"></div>
+    </div>
+  </section>
+
   <!-- ---------- PANTALLA 3: MÓDULO (en construcción) ---------- -->
   <section class="view" id="view-modulo">
     <div class="topbar">
@@ -846,6 +883,12 @@
   // Número de WhatsApp que recibe las solicitudes de guía (formato 569XXXXXXXX).
   // Si queda vacío, WhatsApp pregunta a quién enviar el mensaje.
   var WSP_DESTINO = '';
+
+  // Quienes reciben las solicitudes de guía de despacho (salida de fruta)
+  var WSP_GUIAS = [
+    { nombre:'Camilo Espinoza', numero:'56959544582' },
+    { nombre:'Denisse Ovalle',  numero:'56964917098' }
+  ];
 
   // Catastro de plantas y exportadoras (se reemplaza por la lista oficial)
   var PLANTAS = [];
@@ -1008,6 +1051,7 @@
       fila('Planta', d.planta) + fila('Exportadora', d.exportadora) + fila('Observaciones', d.observaciones);
     $('d-nguia').value = d.numero_guia || '';
     $('btn-emitir').textContent = emitida ? 'Actualizar N° de guía' : 'Marcar guía como emitida';
+    pintarBotonesWsp();
     goTo('view-despacho-ok');
   }
 
@@ -1038,10 +1082,15 @@
     if(d.observaciones){ L.push(''); L.push('Obs.: ' + d.observaciones); }
     return L.join('\n');
   }
-  function compartirGuia(){
+  function compartirGuia(numero){
     if(!despachoActual) return;
-    var url = 'https://wa.me/' + (WSP_DESTINO || '') + '?text=' + encodeURIComponent(textoGuia(despachoActual));
+    var url = 'https://wa.me/' + (numero || '') + '?text=' + encodeURIComponent(textoGuia(despachoActual));
     window.open(url, '_blank');
+  }
+  function pintarBotonesWsp(){
+    $('wsp-botones').innerHTML = WSP_GUIAS.map(function(c){
+      return '<button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="compartirGuia(\''+c.numero+'\')">📲 Enviar a '+esc(c.nombre)+'</button>';
+    }).join('');
   }
 
   function marcarEmitida(){
@@ -1451,6 +1500,129 @@
       abrirChofer();
     }
   })();
+
+  // =====================================================================
+  //  STOCK DE BINS  +  EXCEL DE MOVIMIENTOS (salidas −, entradas +)
+  // =====================================================================
+  var STOCK_MOVS = [];
+
+  function abrirStock(){
+    if(!$('s-hasta').value) $('s-hasta').value = hoyStr();
+    if(!$('s-desde').value){ var d = new Date(); d.setDate(1); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); $('s-desde').value = d.toISOString().slice(0,10); }
+    goTo('view-stock');
+    cargarStock();
+  }
+
+  function cargarStock(){
+    var desde = $('s-desde').value, hasta = $('s-hasta').value;
+    if(!desde || !hasta || desde > hasta){ alert('Revisa las fechas del periodo.'); return; }
+    if(!sb){ $('stock-res').innerHTML = '<p class="hoy-empty">Sin conexión.</p>'; return; }
+    $('stock-res').innerHTML = '<p class="hoy-empty">Cargando…</p>';
+    var cols = 'id,created_at,fecha,solicitante,especie,cuartel,variedad,bins,totes,esponjas,kg_aprox,patente,chofer_nombre,chofer_rut,planta,exportadora,sello,estado,numero_guia,observaciones';
+    Promise.all([
+      sb.from('despachos_bins').select(cols).gte('fecha', desde).lte('fecha', hasta).order('created_at').limit(5000),
+      sb.from('recepcion_cuadratura').select('*').not('campo_id','is',null).gte('campo_fecha', desde).lte('campo_fecha', hasta).order('campo_at').limit(5000)
+    ]).then(function(r){
+      if(r[0].error) throw r[0].error; if(r[1].error) throw r[1].error;
+      var movs = [];
+      (r[0].data||[]).forEach(function(d){
+        movs.push({ ts:d.created_at, fecha:d.fecha, tipo:'Salida', doc:'Solicitud N° '+d.id, guia:d.numero_guia||'',
+          estado_guia: d.estado==='emitida' ? 'Emitida' : 'Pendiente',
+          patente:d.patente, chofer:d.chofer_nombre, rut:d.chofer_rut, exportadora:d.exportadora, planta:d.planta,
+          especie:d.especie, cuartel:d.cuartel, variedad:d.variedad,
+          bins:-(d.bins||0), totes:-(d.totes||0), tapas:0, esponjas:-(d.esponjas||0), kg:d.kg_aprox==null?'':Number(d.kg_aprox),
+          danados:'', responsable:d.solicitante, cruce:'', obs:d.observaciones||'' });
+      });
+      var CRUCE = {cuadrado:'Cuadrado', descuadre:'Descuadre', sin_chofer:'Sin registro chofer', en_camino:'En camino'};
+      (r[1].data||[]).forEach(function(c){
+        movs.push({ ts:c.campo_at, fecha:c.campo_fecha, tipo:'Entrada', doc:'Recepción campo', guia:c.numero_guia,
+          estado_guia:'', patente:c.campo_patente, chofer:c.chofer_nombre||'', rut:c.chofer_rut||'', exportadora:c.exportadora||'', planta:c.planta||'',
+          especie:'', cuartel:'', variedad:'',
+          bins:c.campo_bins||0, totes:c.campo_totes||0, tapas:c.campo_tapas||0, esponjas:c.campo_esponjas||0, kg:'',
+          danados:c.bins_danados||0, responsable:c.encargada, cruce:(CRUCE[c.estado]||'') + (c.estado==='descuadre' && c.revisado ? ' (revisado)' : ''),
+          obs:c.campo_obs||'' });
+      });
+      movs.sort(function(a,b){ return a.ts < b.ts ? -1 : 1; });
+      STOCK_MOVS = movs;
+      pintarStock(desde, hasta);
+    }).catch(function(e){ $('stock-res').innerHTML = '<p class="hoy-empty">Error: '+esc(e.message||e)+'</p>'; });
+  }
+
+  function totalesStock(movs){
+    var t = {}; ['bins','totes','tapas','esponjas'].forEach(function(k){
+      t[k] = {sal:0, ent:0};
+      movs.forEach(function(m){ var v = m[k]||0; if(v<0) t[k].sal += v; else t[k].ent += v; });
+    }); return t;
+  }
+  function sgn(n){ return n>0 ? '+'+fmtNum(n) : fmtNum(n); }
+
+  function pintarStock(desde, hasta){
+    var t = totalesStock(STOCK_MOVS), nS = 0, nE = 0;
+    STOCK_MOVS.forEach(function(m){ m.tipo==='Salida' ? nS++ : nE++; });
+    var row = function(lab, k){ var x = t[k]; return '<td>'+lab+'</td>'; };
+    var h = '<div class="guia-card"><table class="stk-tab"><thead><tr><th></th><th>Bins</th><th>Totes</th><th>Tapas</th><th>Esponjas</th></tr></thead><tbody>';
+    h += '<tr><td>Salidas ('+nS+')</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ return '<td class="neg">'+sgn(t[k].sal)+'</td>'; }).join('') + '</tr>';
+    h += '<tr><td>Entradas ('+nE+')</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ return '<td class="pos">'+sgn(t[k].ent)+'</td>'; }).join('') + '</tr>';
+    h += '<tr class="saldo"><td>Saldo</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ var s = t[k].sal + t[k].ent; return '<td class="'+(s<0?'neg':'pos')+'">'+sgn(s)+'</td>'; }).join('') + '</tr>';
+    h += '</tbody></table>';
+    h += '<p class="stk-note">Periodo '+fmtFecha(desde)+' al '+fmtFecha(hasta)+'. Las entradas usan lo contado por la encargada en el campo.</p></div>';
+    h += '<button class="btn-save" type="button" onclick="descargarExcelStock()"'+(STOCK_MOVS.length?'':' disabled')+'>⬇ Descargar Excel</button>';
+    if(!STOCK_MOVS.length) h += '<p class="draft-note">No hay movimientos en este periodo.</p>';
+    $('stock-res').innerHTML = h;
+  }
+
+  function descargarExcelStock(){
+    if(!window.XLSX){ alert('No se pudo cargar el generador de Excel. Revisa tu conexión e intenta de nuevo.'); return; }
+    var desde = $('s-desde').value, hasta = $('s-hasta').value;
+    var cab = ['Fecha','Hora','Tipo','Documento','N° guía','Estado guía SII','Patente','Chofer','RUT chofer','Exportadora','Planta',
+               'Especie','Cuartel','Variedad','Bins','Totes','Tapas','Esponjas','Kg aprox.','Bins dañados','Responsable','Cruce chofer/campo','Observaciones'];
+    var filas = STOCK_MOVS.map(function(m){
+      return [fmtFecha(m.fecha), fmtHora(m.ts), m.tipo, m.doc, m.guia, m.estado_guia, m.patente, m.chofer, m.rut, m.exportadora, m.planta,
+              m.especie, m.cuartel, m.variedad, m.bins, m.totes, m.tapas, m.esponjas, m.kg, m.danados, m.responsable, m.cruce, m.obs];
+    });
+    var t = totalesStock(STOCK_MOVS);
+    var tot = function(lab, f){ var r = new Array(cab.length).fill(''); r[0] = lab; ['bins','totes','tapas','esponjas'].forEach(function(k,i){ r[14+i] = f(t[k]); }); return r; };
+    filas.push(new Array(cab.length).fill(''));
+    filas.push(tot('TOTAL SALIDAS', function(x){ return x.sal; }));
+    filas.push(tot('TOTAL ENTRADAS', function(x){ return x.ent; }));
+    filas.push(tot('SALDO', function(x){ return x.sal + x.ent; }));
+
+    var ws = XLSX.utils.aoa_to_sheet([cab].concat(filas));
+    ws['!cols'] = [10,6,8,16,10,12,9,20,13,18,16,10,8,14,7,7,7,9,9,10,18,18,28].map(function(w){ return {wch:w}; });
+    ws['!autofilter'] = { ref: XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:STOCK_MOVS.length, c:cab.length-1}}) };
+
+    // Hoja resumen por exportadora
+    var porExp = {};
+    STOCK_MOVS.forEach(function(m){
+      var k = m.exportadora || '(sin exportadora)';
+      if(!porExp[k]) porExp[k] = {sb:0,eb:0,st:0,et:0,sp:0,ep:0,se:0,ee:0};
+      var e = porExp[k];
+      if(m.tipo==='Salida'){ e.sb+=m.bins; e.st+=m.totes; e.sp+=m.tapas; e.se+=m.esponjas; }
+      else { e.eb+=m.bins; e.et+=m.totes; e.ep+=m.tapas; e.ee+=m.esponjas; }
+    });
+    var res = [['Resumen por exportadora · ' + fmtFecha(desde) + ' al ' + fmtFecha(hasta)], [],
+      ['Exportadora','Bins salidas','Bins entradas','Saldo bins','Totes salidas','Totes entradas','Saldo totes','Tapas salidas','Tapas entradas','Saldo tapas','Esponjas salidas','Esponjas entradas','Saldo esponjas']];
+    Object.keys(porExp).sort().forEach(function(k){
+      var e = porExp[k];
+      res.push([k, e.sb, e.eb, e.sb+e.eb, e.st, e.et, e.st+e.et, e.sp, e.ep, e.sp+e.ep, e.se, e.ee, e.se+e.ee]);
+    });
+    var ws2 = XLSX.utils.aoa_to_sheet(res);
+    ws2['!cols'] = [{wch:24}].concat(new Array(12).fill({wch:12}));
+
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Movimientos');
+    XLSX.utils.book_append_sheet(wb, ws2, 'Resumen');
+    var nombre = 'Movimientos_bins_' + desde + '_a_' + hasta + '.xlsx';
+    var buf = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+    var blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    var file = new File([blob], nombre, {type: blob.type});
+    if(navigator.canShare && navigator.canShare({files:[file]}) && /Android|iPhone|iPad/i.test(navigator.userAgent)){
+      navigator.share({files:[file], title:'Movimientos de bins'}).catch(function(){});
+    } else {
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nombre;
+      document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    }
+  }
 </script>
 </body>
 </html>
