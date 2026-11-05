@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --teal-deep:   #123B4D;
@@ -1575,8 +1574,17 @@
     $('stock-res').innerHTML = h;
   }
 
+  // La librería de Excel se carga solo cuando se necesita (no bloquea la app al abrir)
+  function cargarXLSX(cb){
+    if(window.XLSX) return cb();
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = cb;
+    s.onerror = function(){ alert('No se pudo cargar el generador de Excel. Revisa tu conexión e intenta de nuevo.'); };
+    document.head.appendChild(s);
+  }
   function descargarExcelStock(){
-    if(!window.XLSX){ alert('No se pudo cargar el generador de Excel. Revisa tu conexión e intenta de nuevo.'); return; }
+    if(!window.XLSX){ return cargarXLSX(descargarExcelStock); }
     var desde = $('s-desde').value, hasta = $('s-hasta').value;
     var cab = ['Fecha','Hora','Tipo','Documento','N° guía','Estado guía SII','Patente','Chofer','RUT chofer','Exportadora','Planta',
                'Especie','Cuartel','Variedad','Bins','Totes','Tapas','Esponjas','Kg aprox.','Bins dañados','Responsable','Cruce chofer/campo','Observaciones'];
