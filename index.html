@@ -169,6 +169,34 @@
   .option-card--vivid .option-sub{ color:rgba(255,255,255,0.82); position:relative; z-index:1; }
   .option-card--vivid .option-chev{ color:rgba(255,255,255,0.85); position:relative; z-index:1; }
   .card-stk{ background: linear-gradient(135deg, #4FA65B 0%, #235A34 100%); }
+  .paso-title{ display:flex; align-items:center; gap:9px; margin:22px 0 2px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; letter-spacing:0.06em; text-transform:uppercase; color:#8FD39B; }
+  .paso-title--card{ margin:12px 0 0; color:var(--teal-mid); }
+  .paso-n{ flex:none; width:24px; height:24px; border-radius:50%; background:#62C46E; color:#0E2A17; display:flex; align-items:center; justify-content:center; font-size:13px; letter-spacing:0; }
+  .paso-title--card .paso-n{ background:var(--teal-mid); color:#fff; }
+  .paso-hecho{ opacity:0.55; }
+  .card-sol{ background: linear-gradient(135deg, #3E5C76 0%, #1B2E40 100%); }
+  /* ---------- Contraseña ---------- */
+  .clave-overlay{ position:fixed; inset:0; z-index:50; background:rgba(8,20,26,0.72); display:none; align-items:center; justify-content:center; padding:24px; }
+  .clave-overlay.is-on{ display:flex; }
+  .clave-box{ width:100%; max-width:340px; background:var(--paper); color:var(--ink); border-radius:18px; padding:22px 20px; box-shadow:0 20px 40px -16px rgba(0,0,0,0.6); }
+  .clave-box h3{ margin:0 0 4px; font-family:'Space Grotesk',sans-serif; font-size:19px; }
+  .clave-box p{ margin:0 0 14px; font-size:13.5px; color:var(--ink-soft); }
+  .clave-box input{ width:100%; border:1.4px solid rgba(20,33,28,0.18); border-radius:11px; padding:13px; font-size:20px; text-align:center; letter-spacing:0.3em; font-family:'Space Grotesk',sans-serif; }
+  .clave-box input:focus{ outline:none; border-color:var(--leaf); }
+  .clave-err{ display:none; margin-top:8px; color:#C2452A; font-size:13px; text-align:center; }
+  .clave-err.is-on{ display:block; }
+  .clave-recordar{ display:flex; align-items:center; gap:8px; margin-top:12px; font-size:13px; color:var(--ink-soft); }
+  .clave-box .btn-ghost{ color:var(--ink); border-color:rgba(20,33,28,0.15); background:transparent; }
+  /* ---------- Aviso en vivo ---------- */
+  .toast{ position:fixed; left:50%; bottom:22px; transform:translate(-50%, 140%); z-index:60; width:calc(100% - 32px); max-width:480px;
+    background:#0E2A17; color:#fff; border:1px solid rgba(98,196,110,0.6); border-radius:14px; padding:13px 16px;
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; box-shadow:0 16px 32px -12px rgba(0,0,0,0.6);
+    transition:transform .3s ease; cursor:pointer; }
+  .toast.is-on{ transform:translate(-50%, 0); }
+  .toast small{ display:block; font-family:'Inter',sans-serif; font-weight:400; font-size:12.5px; color:rgba(255,255,255,0.75); margin-top:2px; }
+  .estado.apro{ background:#DCEAF1; color:#1F6E8C; }
+  .card-dev{ background: linear-gradient(135deg, #D9534F 0%, #8C2A22 100%); }
+  #view-devolucion .content, #view-dev-lista .content{ padding:12px 20px 28px; display:flex; flex-direction:column; }
 
   /* ---------- Pantalla en construcción ---------- */
   .wip-card{
@@ -371,8 +399,13 @@
       <p class="sel-sub">Elige un módulo para continuar.</p>
 
       <div class="option-list">
-        <button class="option-card option-card--vivid card-ofm" type="button" onclick="abrirDespacho()">
+        <button class="option-card option-card--vivid card-sol" type="button" onclick="abrirHoy()">
           <span class="pend-pill" id="pend-pill"></span>
+          <span class="option-icon-vivid">🔒</span>
+          <span class="option-text"><p class="option-title">Solicitudes de guía</p><p class="option-sub">Aprobar, agregar N° de guía y enviar al grupo (con contraseña)</p></span>
+          <span class="option-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </button>
+        <button class="option-card option-card--vivid card-ofm" type="button" onclick="abrirDespacho()">
           <span class="option-icon-vivid">🚚</span>
           <span class="option-text"><p class="option-title">Despacho de bins</p><p class="option-sub">Salida de bins con fruta a packing / planta</p></span>
           <span class="option-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
@@ -381,6 +414,11 @@
           <span class="pend-pill" id="desc-pill"></span>
           <span class="option-icon-vivid">📥</span>
           <span class="option-text"><p class="option-title">Recepción de bins vacíos</p><p class="option-sub">Chofer + campo, con cruce y aviso de descuadre</p></span>
+          <span class="option-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </button>
+        <button class="option-card option-card--vivid card-dev" type="button" onclick="abrirDevolucion()">
+          <span class="option-icon-vivid">↩️</span>
+          <span class="option-text"><p class="option-title">Devolución de material</p><p class="option-sub">Bins, totes, tapas o esponjas que salen del campo</p></span>
           <span class="option-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
         </button>
         <button class="option-card option-card--vivid card-stk" type="button" onclick="abrirStock()">
@@ -409,9 +447,9 @@
       <span class="topbar-label">Despacho de bins</span>
     </div>
     <div class="content">
-      <h2 class="sel-heading">Solicitud de guía de despacho</h2>
+      <h2 class="sel-heading" id="h-desp">Solicitud de guía de despacho</h2>
       <p class="sel-sub" style="margin-bottom:0">Fruta que sale del campo hacia la exportadora.</p>
-      <button class="link-hoy" type="button" onclick="abrirHoy()">Ver solicitudes de guía →</button>
+      <button class="link-hoy" type="button" onclick="abrirHoy()">🔒 Ver solicitudes de guía →</button>
 
       <form id="form-despacho" autocomplete="off" novalidate>
         <div class="form-card">
@@ -517,6 +555,7 @@
         </div>
 
         <button class="btn-save" type="submit" id="btn-guardar-desp">Guardar y generar solicitud</button>
+        <button class="btn-ghost" type="button" id="cancel-desp" style="display:none" onclick="cancelarEdicion('desp')">Cancelar edición</button>
         <p class="draft-note">Lo que escribas queda guardado aunque salgas de la pantalla.</p>
       </form>
 
@@ -538,32 +577,56 @@
     <div class="content">
       <div class="ok-badge">✓</div>
       <h2 class="ok-title" id="ok-title">Solicitud guardada</h2>
-      <p class="ok-sub">Datos para emitir la guía de despacho</p>
+      <p class="ok-sub" id="ok-sub-desp">Datos para emitir la guía de despacho</p>
       <div class="guia-card" id="guia-card"></div>
-            <div id="wsp-botones"></div>
-      <div class="form-card" id="emitir-card">
-        <p class="form-card-title"><span>🧾</span>Guía SII</p>
+      <div id="paso1">
+        <p class="paso-title"><span class="paso-n">1</span>Encargado: enviar solicitud</p>
+        <div id="wsp-botones"></div>
+      </div>
+      <div class="form-card" id="aprobar-card">
+        <p class="paso-title paso-title--card"><span class="paso-n">2</span>Aprobar solicitud</p>
+        <p class="stk-note" style="margin-top:6px">Revisa los datos. Al aprobar, la solicitud queda con ✓ y lista para agregar el N° de guía.</p>
         <div class="field">
-          <label for="d-nguia">N° de guía emitida en el SII</label>
+          <label for="d-aprobador">Aprobado por</label>
+          <input type="text" id="d-aprobador" value="Camilo Espinoza">
+        </div>
+        <button class="btn-save" type="button" id="btn-aprobar" onclick="aprobarSolicitud()">✓ Aprobar solicitud</button>
+      </div>
+      <div class="form-card" id="emitir-card">
+        <p class="paso-title paso-title--card"><span class="paso-n">3</span>Agregar N° de guía emitida (SII)</p>
+        <div class="field">
+          <label for="d-nguia">N° de guía emitida <span class="req">*</span></label>
           <input type="text" id="d-nguia" inputmode="numeric">
         </div>
-        <button class="btn-save" type="button" id="btn-emitir" onclick="marcarEmitida()">Marcar guía como emitida</button>
+        <div class="field">
+          <label>Archivo de la guía <span class="hint">(PDF o foto)</span></label>
+          <label class="foto-picker" for="d-guia-file"><span class="foto-picker-plus">+</span><span id="d-guia-file-txt">Adjuntar guía</span></label>
+          <input type="file" id="d-guia-file" accept="application/pdf,image/*" style="display:none">
+        </div>
+        <button class="btn-save" type="button" id="btn-emitir" onclick="marcarEmitida()">Guardar guía emitida</button>
       </div>
+      <div id="paso3" style="display:none">
+        <p class="paso-title"><span class="paso-n">4</span>Enviar guía al grupo de despacho</p>
+        <button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="enviarGuiaGrupo()">📲 Enviar guía al grupo de despacho</button>
+        <p class="draft-note" id="paso3-nota"></p>
+      </div>
+      <button class="btn-ghost" type="button" onclick="editarDespacho()">✏️ Editar solicitud</button>
       <button class="btn-ghost" type="button" onclick="nuevoDespacho()">Nuevo despacho</button>
-      <button class="btn-ghost" type="button" onclick="abrirHoy()">Ver solicitudes</button>
+      <button class="btn-ghost" type="button" onclick="abrirHoy()">🔒 Ver solicitudes</button>
     </div>
   </section>
 
   <!-- ---------- PANTALLA: DESPACHOS DEL DÍA ---------- -->
   <section class="view" id="view-despacho-hoy">
     <div class="topbar">
-      <button class="btn-back" type="button" onclick="goTo('view-despacho')" aria-label="Volver">
+      <button class="btn-back" type="button" onclick="goTo('view-seleccion')" aria-label="Volver">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <span class="topbar-label">Solicitudes</span>
     </div>
     <div class="content">
-      <h2 class="sel-heading">Solicitudes de guía</h2>
+      <h2 class="sel-heading">🔒 Solicitudes de guía</h2>
+      <button class="link-hoy" type="button" style="color:rgba(246,244,236,0.6)" onclick="cerrarClave()">Cerrar sesión en este equipo</button>
       <div class="tabs2"><button type="button" id="tab-pend" class="is-on" onclick="cargarLista('pend')">Pendientes <span id="tab-pend-n"></span></button><button type="button" id="tab-hoy" onclick="cargarLista('hoy')">Hoy</button></div>
       <div class="hoy-totales">
         <div class="hoy-tot"><b id="tot-camiones">0</b><small>Camiones</small></div>
@@ -618,7 +681,7 @@
       <span class="topbar-label">Chofer · Salida de exportadora</span>
     </div>
     <div class="content">
-      <h2 class="sel-heading">Bins vacíos que retiras</h2>
+      <h2 class="sel-heading" id="h-chofer">Bins vacíos que retiras</h2>
       <p class="sel-sub" style="margin-bottom:0">Completa antes de salir de la exportadora y sube la foto de la guía.</p>
       <form id="form-chofer" autocomplete="off" novalidate>
         <div class="form-card">
@@ -688,6 +751,7 @@
           </div>
         </div>
         <button class="btn-save" type="submit" id="btn-chofer">Enviar</button>
+        <button class="btn-ghost" type="button" id="cancel-chofer" style="display:none" onclick="cancelarEdicion('chofer')">Cancelar edición</button>
         <p class="draft-note">Lo que escribas queda guardado aunque salgas de la pantalla.</p>
       </form>
     </div>
@@ -702,7 +766,7 @@
       <span class="topbar-label">Recepción en campo</span>
     </div>
     <div class="content">
-      <h2 class="sel-heading">¿Qué llegó al campo?</h2>
+      <h2 class="sel-heading" id="h-campo">¿Qué llegó al campo?</h2>
       <p class="sel-sub" style="margin-bottom:0">Cuenta lo recibido. Lo que declaró el chofer no se muestra hasta que guardes.</p>
 
       <div id="encamino-wrap" style="display:none">
@@ -766,6 +830,7 @@
           </div>
         </div>
         <button class="btn-save" type="submit" id="btn-campo">Guardar y cruzar</button>
+        <button class="btn-ghost" type="button" id="cancel-campo" style="display:none" onclick="cancelarEdicion('campo')">Cancelar edición</button>
         <p class="draft-note">Lo que escribas queda guardado aunque salgas de la pantalla.</p>
       </form>
     </div>
@@ -811,7 +876,7 @@
     </div>
     <div class="content">
       <h2 class="sel-heading">Movimientos de bins</h2>
-      <p class="sel-sub" style="margin-bottom:0">Salidas (despachos con fruta) en −, entradas (bins vacíos recibidos en campo) en +.</p>
+      <p class="sel-sub" style="margin-bottom:0">Salidas en − (despachos con fruta y devoluciones de material), entradas en + (bins vacíos recibidos en campo).</p>
       <div class="form-card">
         <p class="form-card-title"><span>📅</span>Periodo</p>
         <div class="field-row">
@@ -821,6 +886,116 @@
         <button class="btn-save" type="button" id="btn-stock" onclick="cargarStock()">Ver saldo</button>
       </div>
       <div id="stock-res"></div>
+    </div>
+  </section>
+
+  <!-- ---------- PANTALLA: DEVOLUCIÓN DE MATERIAL ---------- -->
+  <section class="view" id="view-devolucion">
+    <div class="topbar">
+      <button class="btn-back" type="button" onclick="goTo('view-seleccion')" aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="topbar-label">Devolución de material</span>
+    </div>
+    <div class="content">
+      <h2 class="sel-heading" id="h-dev">Material que sale del campo</h2>
+      <p class="sel-sub" style="margin-bottom:0">Bins, totes, tapas o esponjas que se devuelven. Se descuentan del stock en campo.</p>
+      <button class="link-hoy" type="button" onclick="abrirListaDev()">Ver devoluciones registradas →</button>
+      <form id="form-dev" autocomplete="off" novalidate>
+        <div class="form-card">
+          <p class="form-card-title"><span>👤</span>Responsable y destino</p>
+          <div class="field">
+            <label for="v-responsable">Responsable <span class="req">*</span></label>
+            <input type="text" id="v-responsable" required>
+          </div>
+          <div class="field">
+            <label for="v-exportadora">Exportadora a la que se devuelve <span class="req">*</span></label>
+            <input type="text" id="v-exportadora" required>
+          </div>
+          <div class="field">
+            <label for="v-planta">Planta</label>
+            <input type="text" id="v-planta">
+          </div>
+          <div class="field">
+            <label for="v-motivo">Motivo <span class="req">*</span></label>
+            <select id="v-motivo" required>
+              <option value="">Elegir…</option>
+              <option>Material dañado</option>
+              <option>Sobrante / no utilizado</option>
+              <option>Solicitado por la exportadora</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-card">
+          <p class="form-card-title"><span>📦</span>Material devuelto</p>
+          <div class="field-row">
+            <div class="field">
+              <label for="v-bins">Bins</label>
+              <div class="stepper"><button type="button" onclick="paso('v-bins',-1)">−</button><input type="number" id="v-bins" inputmode="numeric" min="0" value="0"><button type="button" onclick="paso('v-bins',1)">+</button></div>
+            </div>
+            <div class="field">
+              <label for="v-totes">Totes</label>
+              <div class="stepper"><button type="button" onclick="paso('v-totes',-1)">−</button><input type="number" id="v-totes" inputmode="numeric" min="0" value="0"><button type="button" onclick="paso('v-totes',1)">+</button></div>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="v-tapas">Tapas</label>
+              <div class="stepper"><button type="button" onclick="paso('v-tapas',-1)">−</button><input type="number" id="v-tapas" inputmode="numeric" min="0" value="0"><button type="button" onclick="paso('v-tapas',1)">+</button></div>
+            </div>
+            <div class="field">
+              <label for="v-esponjas">Esponjas</label>
+              <div class="stepper"><button type="button" onclick="paso('v-esponjas',-1)">−</button><input type="number" id="v-esponjas" inputmode="numeric" min="0" value="0"><button type="button" onclick="paso('v-esponjas',1)">+</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="form-card">
+          <p class="form-card-title"><span>🚚</span>Transporte <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink-soft)">(si corresponde)</span></p>
+          <div class="field-row">
+            <div class="field">
+              <label for="v-guia">N° de guía</label>
+              <input type="text" id="v-guia" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="v-patente">Patente</label>
+              <input type="text" id="v-patente" style="text-transform:uppercase">
+            </div>
+          </div>
+          <div class="field">
+            <label for="v-chofer">Chofer</label>
+            <input type="text" id="v-chofer">
+          </div>
+          <div class="field">
+            <label>Foto de la guía de devolución</label>
+            <label class="foto-picker" for="v-foto"><span class="foto-picker-plus">+</span><span id="v-foto-txt">Tomar o elegir foto</span></label>
+            <input type="file" id="v-foto" accept="image/*" style="display:none">
+            <div class="foto-prev" id="v-foto-prev"></div>
+          </div>
+          <div class="field">
+            <label for="v-obs">Observaciones</label>
+            <textarea id="v-obs"></textarea>
+          </div>
+        </div>
+        <button class="btn-save" type="submit" id="btn-dev">Registrar devolución</button>
+        <button class="btn-ghost" type="button" id="cancel-dev" style="display:none" onclick="cancelarEdicion('dev')">Cancelar edición</button>
+        <p class="draft-note">Lo que escribas queda guardado aunque salgas de la pantalla.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ---------- PANTALLA: LISTA DE DEVOLUCIONES ---------- -->
+  <section class="view" id="view-dev-lista">
+    <div class="topbar">
+      <button class="btn-back" type="button" onclick="abrirDevolucion()" aria-label="Volver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="topbar-label">Devoluciones</span>
+    </div>
+    <div class="content">
+      <h2 class="sel-heading">Devoluciones registradas</h2>
+      <p class="sel-sub" style="margin-bottom:0">Toca una para ver el detalle o corregirla.</p>
+      <div id="dev-lista"></div>
     </div>
   </section>
 
@@ -843,6 +1018,18 @@
   </section>
 </div>
 
+<div class="clave-overlay" id="clave-overlay">
+  <form class="clave-box" id="clave-form" autocomplete="off">
+    <h3>🔒 Solicitudes de guía</h3>
+    <p>Ingresa la contraseña para aprobar solicitudes y agregar N° de guía.</p>
+    <input type="password" id="clave-input" inputmode="numeric" autocomplete="off">
+    <div class="clave-err" id="clave-err">Contraseña incorrecta</div>
+    <label class="clave-recordar"><input type="checkbox" id="clave-recordar" checked style="width:auto"> Recordar en este equipo</label>
+    <button class="btn-save" type="submit">Entrar</button>
+    <button class="btn-ghost" type="button" onclick="cerrarOverlayClave()">Cancelar</button>
+  </form>
+</div>
+<div class="toast" id="toast" onclick="this.classList.remove('is-on')"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
   function goTo(id){
@@ -929,6 +1116,7 @@
 
   // ---- Navegación ----
   function abrirDespacho(){
+    if(EDIT.desp) salirEdicion('desp');
     cargarBorrador();
     cargarSugerencias();
     goTo('view-despacho');
@@ -941,6 +1129,7 @@
 
   // ---- Borrador (no se pierde lo escrito) ----
   function guardarBorrador(){
+    if(EDIT.desp) return;
     var b = {}; CAMPOS_DESP.forEach(function(id){ b[id] = $(id).value; }); lsSet(BORRADOR_KEY, b);
   }
   function cargarBorrador(){
@@ -1016,27 +1205,35 @@
     };
 
     var btn = $('btn-guardar-desp'); btn.disabled = true; btn.textContent = 'Guardando…';
-    sb.from('despachos_bins').insert(reg).select().single().then(function(res){
-      btn.disabled = false; btn.textContent = 'Guardar y generar solicitud';
+    var editId = EDIT.desp;
+    if(editId){ delete reg.fecha; reg.editado_at = new Date().toISOString(); }
+    var q = editId ? sb.from('despachos_bins').update(reg).eq('id', editId) : sb.from('despachos_bins').insert(reg);
+    q.select().single().then(function(res){
+      btn.disabled = false; btn.textContent = editId ? 'Guardar cambios' : 'Guardar y generar solicitud';
       if(res.error){ alert('No se pudo guardar: ' + res.error.message + '\nLo escrito no se pierde, intenta de nuevo.'); return; }
+      if(editId){ salirEdicion('desp'); mostrarDespacho(res.data); actualizarPendientes(); return; }
       // limpiar borrador dejando los datos que se repiten
       var nb = {}; RECORDAR.forEach(function(id){ nb[id] = $(id).value; }); lsSet(BORRADOR_KEY, nb);
       CAMPOS_DESP.forEach(function(id){ if(RECORDAR.indexOf(id) < 0) $(id).value = ($(id).type==='number' && id!=='d-kg') ? '0' : ''; });
-      mostrarDespacho(res.data);
+      mostrarDespacho(res.data, 'nuevo');
       actualizarPendientes();
     });
   }
 
   // ---- Resumen de la solicitud ----
   function fila(k, v){ return (v===null || v===undefined || v==='') ? '' : '<div class="guia-row"><span>'+k+'</span><span>'+esc(v)+'</span></div>'; }
-  function mostrarDespacho(d){
+  var despachoModo = 'gestion';
+  function mostrarDespacho(d, modo){
+    if(modo) despachoModo = modo; else if(!despachoActual || despachoActual.id !== d.id) despachoModo = 'gestion';
     despachoActual = d;
-    var emitida = d.estado === 'emitida';
-    $('ok-title').textContent = emitida ? 'Guía emitida' : 'Solicitud N° ' + d.id;
+    var emitida = d.estado === 'emitida', aprobada = d.estado === 'aprobada';
+    $('ok-title').textContent = emitida ? 'Guía emitida' : aprobada ? '✓ Solicitud N° ' + d.id + ' aprobada' : 'Solicitud N° ' + d.id;
     $('guia-card').innerHTML =
       '<div class="guia-head"><b>Solicitud de guía N° '+d.id+'</b><span>'+fmtFecha(d.fecha)+' · '+fmtHora(d.created_at)+'</span></div>' +
       fila('Solicitado por', d.solicitante) +
+      (d.aprobada_at ? fila('Aprobada por', (d.aprobado_por || '') + ' · ' + fmtFecha(d.aprobada_at) + ' ' + fmtHora(d.aprobada_at)) : '') +
       (emitida ? fila('N° guía SII', d.numero_guia) : '') +
+      (d.guia_archivo_url ? '<div class="guia-row"><span>Archivo guía</span><span><a href="'+esc(d.guia_archivo_url)+'" target="_blank" rel="noopener">Ver guía ↗</a></span></div>' : '') +
       '<p class="guia-sec">Origen</p>' +
       fila('Especie', d.especie) + fila('Cuartel', d.cuartel) + fila('Variedad', d.variedad) +
       fila('CSG', d.csg) + fila('SDP', d.sdp) +
@@ -1049,7 +1246,24 @@
       '<p class="guia-sec">Destino</p>' +
       fila('Planta', d.planta) + fila('Exportadora', d.exportadora) + fila('Observaciones', d.observaciones);
     $('d-nguia').value = d.numero_guia || '';
-    $('btn-emitir').textContent = emitida ? 'Actualizar N° de guía' : 'Marcar guía como emitida';
+    $('btn-emitir').textContent = emitida ? 'Actualizar guía emitida' : 'Guardar guía emitida';
+    guiaFile = null; $('d-guia-file').value = '';
+    $('d-guia-file-txt').textContent = d.guia_archivo_url ? 'Cambiar archivo (ya hay uno adjunto)' : 'Adjuntar guía';
+    var nuevo = despachoModo === 'nuevo';
+    $('paso1').classList.toggle('paso-hecho', emitida || aprobada);
+    $('paso1').style.display = (nuevo || !emitida) ? '' : 'none';
+    var pendiente = !emitida && !aprobada;
+    $('aprobar-card').style.display = (!nuevo && pendiente) ? '' : 'none';
+    $('emitir-card').style.display = (!nuevo && !pendiente) ? '' : 'none';
+    $('paso3').style.display = (emitida && !nuevo) ? '' : 'none';
+    $('ok-sub-desp').textContent = nuevo ?
+        (emitida ? '✓ Guía N° ' + d.numero_guia + ' emitida' :
+         aprobada ? '✓ Aprobada por ' + (d.aprobado_por || '') + ' · esperando N° de guía' :
+         'Envía la solicitud · aquí verás cuando sea aprobada') :
+      emitida ? 'Guía emitida · puedes enviarla al grupo' :
+      aprobada ? 'Aprobada · falta agregar el N° de guía emitida' : 'Pendiente de aprobación';
+    $('paso3-nota').textContent = 'Se abre WhatsApp: elige el grupo de despacho y envía.' +
+      (d.guia_archivo_url ? '' : ' (No hay archivo de guía adjunto: se enviarán solo los datos.)');
     pintarBotonesWsp();
     goTo('view-despacho-ok');
   }
@@ -1079,6 +1293,9 @@
     L.push('Planta: ' + d.planta);
     L.push('Exportadora: ' + d.exportadora);
     if(d.observaciones){ L.push(''); L.push('Obs.: ' + d.observaciones); }
+    L.push('');
+    L.push('👉 Abrir solicitud para emitir la guía:');
+    L.push(linkSolicitud(d.id));
     return L.join('\n');
   }
   function compartirGuia(numero){
@@ -1087,41 +1304,144 @@
     window.open(url, '_blank');
   }
   function pintarBotonesWsp(){
-    var h = '<button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="compartirGuia(\'\')">📲 1 · Enviar al grupo de despacho</button>';
-    h += WSP_GUIAS.map(function(c, i){
-      return '<button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="compartirGuia(\''+c.numero+'\')">📲 '+(i+2)+' · Enviar a '+esc(c.nombre)+'</button>';
+    var nombres = WSP_GUIAS.map(function(c){ return c.nombre; }).join(' / ');
+    var h = WSP_GUIAS.map(function(c){
+      return '<button class="btn-save btn-wsp" type="button" style="margin-top:10px" onclick="compartirGuia(\''+c.numero+'\')">📲 Enviar solicitud a '+esc(c.nombre)+'</button>';
     }).join('');
-    h += '<p class="draft-note">En el grupo: se abre WhatsApp, elige el grupo de despacho y envía. Luego envíalo también a '+esc(WSP_GUIAS.map(function(c){return c.nombre;}).join(', '))+'.</p>';
+    h += '<p class="draft-note">'+esc(nombres)+' recibe los datos y un link para abrir esta solicitud, emitir la guía y enviarla al grupo.</p>';
     $('wsp-botones').innerHTML = h;
   }
 
+
+  var guiaFile = null;
+  function enfocarGuia(){
+    setTimeout(function(){
+      var d = despachoActual; if(!d) return;
+      var el = d.estado === 'emitida' ? $('paso3') : d.estado === 'aprobada' ? $('emitir-card') : $('aprobar-card');
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+      if(d.estado === 'aprobada') $('d-nguia').focus({preventScroll:true});
+    }, 80);
+  }
+  function linkSolicitud(id){ return location.origin + location.pathname + '?guia=' + id; }
+
+  function aprobarSolicitud(){
+    if(!despachoActual || !sb) return;
+    var quien = $('d-aprobador').value.trim();
+    if(!quien){ alert('Indica quién aprueba.'); $('d-aprobador').focus(); return; }
+    var btn = $('btn-aprobar'); btn.disabled = true; btn.textContent = 'Aprobando…';
+    sb.from('despachos_bins').update({ estado:'aprobada', aprobada_at:new Date().toISOString(), aprobado_por:quien })
+      .eq('id', despachoActual.id).select().single().then(function(res){
+        btn.disabled = false; btn.textContent = '✓ Aprobar solicitud';
+        if(res.error){ alert('No se pudo aprobar: ' + res.error.message); return; }
+        mostrarDespacho(res.data, 'gestion');
+        actualizarPendientes();
+        enfocarGuia();
+      });
+  }
 
   function marcarEmitida(){
     if(!despachoActual || !sb) return;
     var n = $('d-nguia').value.trim();
     if(!n){ alert('Ingresa el N° de la guía emitida en el SII.'); $('d-nguia').focus(); return; }
-    var btn = $('btn-emitir'); btn.disabled = true;
-    sb.from('despachos_bins')
-      .update({ estado:'emitida', numero_guia:n, emitida_at:new Date().toISOString() })
-      .eq('id', despachoActual.id).select().single()
-      .then(function(res){
-        btn.disabled = false;
-        if(res.error){ alert('No se pudo actualizar: ' + res.error.message); return; }
-        mostrarDespacho(res.data);
-        actualizarPendientes();
+    var btn = $('btn-emitir'); btn.disabled = true; btn.textContent = guiaFile ? 'Subiendo guía…' : 'Guardando…';
+    var subir = Promise.resolve(null);
+    if(guiaFile){
+      var ext = (guiaFile.name.split('.').pop() || 'pdf').toLowerCase().replace(/[^a-z0-9]/g,'');
+      var path = 'sii/' + hoyStr() + '/guia-' + n.replace(/[^0-9A-Za-z]/g,'') + '-' + Date.now() + '.' + ext;
+      subir = sb.storage.from(FOTO_BUCKET).upload(path, guiaFile, {contentType: guiaFile.type || 'application/pdf'}).then(function(r){
+        if(r.error) throw r.error;
+        return sb.storage.from(FOTO_BUCKET).getPublicUrl(path).data.publicUrl;
       });
+    }
+    var archivoLocal = guiaFile;
+    subir.then(function(url){
+      var upd = { estado:'emitida', numero_guia:n, emitida_at: despachoActual.emitida_at || new Date().toISOString() };
+      if(!despachoActual.aprobada_at){ upd.aprobada_at = upd.emitida_at; upd.aprobado_por = $('d-aprobador').value.trim() || null; }
+      if(url) upd.guia_archivo_url = url;
+      return sb.from('despachos_bins').update(upd).eq('id', despachoActual.id).select().single();
+    }).then(function(res){
+      if(res.error) throw res.error;
+      mostrarDespacho(res.data);
+      guiaFile = archivoLocal;   // se mantiene para poder compartir el archivo directo en WhatsApp
+      actualizarPendientes();
+      setTimeout(function(){ $('paso3').scrollIntoView({behavior:'smooth', block:'center'}); }, 50);
+    }).catch(function(e){
+      alert('No se pudo guardar: ' + (e.message || e));
+    }).then(function(){ btn.disabled = false; btn.textContent = despachoActual && despachoActual.estado==='emitida' ? 'Actualizar guía emitida' : 'Guardar guía emitida'; });
+  }
+
+  function textoGuiaEmitida(d){
+    var L = [];
+    L.push('✅ *GUÍA DE DESPACHO EMITIDA N° ' + d.numero_guia + '*');
+    L.push('Fundo Lo Ovalle · Solicitud N° ' + d.id + ' · ' + fmtFecha(d.fecha));
+    L.push('');
+    L.push(d.especie + ' · ' + d.variedad + ' · Cuartel ' + d.cuartel);
+    L.push('Bins: ' + d.bins + ' · Totes: ' + d.totes + (d.kg_aprox != null ? ' · Kg aprox.: ' + fmtNum(d.kg_aprox) : ''));
+    L.push('Chofer: ' + d.chofer_nombre + ' · Patente ' + d.patente + (d.sello ? ' · Sello ' + d.sello : ''));
+    L.push('Destino: ' + d.planta + ' · ' + d.exportadora);
+    if(d.guia_archivo_url){ L.push(''); L.push('📄 Guía: ' + d.guia_archivo_url); }
+    return L.join('\n');
+  }
+  function enviarGuiaGrupo(){
+    var d = despachoActual; if(!d) return;
+    var txt = textoGuiaEmitida(d);
+    if(guiaFile && navigator.canShare && navigator.canShare({files:[guiaFile]})){
+      navigator.share({ files:[guiaFile], text: txt }).catch(function(e){
+        if(e && e.name === 'AbortError') return;
+        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+      });
+      return;
+    }
+    window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
   }
 
   // ---- Lista de solicitudes ----
   var LISTA_CACHE = {};
-  function abrirHoy(){ goTo('view-despacho-hoy'); cargarLista('pend'); }
+  // ---- Acceso con contraseña a la gestión de solicitudes ----
+  var CLAVE_HASH = '7bba7430bd3a7e0115f09460afee0fe2647c8045d9752a77a46ca3d92efed98a';   // sha256('despacho:' + contraseña)
+  var CLAVE_KEY = 'desp_gestion_ok';
+  var claveOk = false, claveCallback = null;
+  function hashClave(txt){
+    var data = new TextEncoder().encode('despacho:' + txt);
+    return crypto.subtle.digest('SHA-256', data).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
+    });
+  }
+  function claveRecordada(){ try{ return localStorage.getItem(CLAVE_KEY) === CLAVE_HASH; }catch(e){ return false; } }
+  function pedirClave(cb){
+    if(claveOk || claveRecordada()){ claveOk = true; cb(); return; }
+    claveCallback = cb;
+    $('clave-input').value = ''; $('clave-err').classList.remove('is-on');
+    $('clave-overlay').classList.add('is-on');
+    setTimeout(function(){ $('clave-input').focus(); }, 50);
+  }
+  function cerrarOverlayClave(){ $('clave-overlay').classList.remove('is-on'); claveCallback = null; }
+  function cerrarClave(){
+    claveOk = false; try{ localStorage.removeItem(CLAVE_KEY); }catch(e){}
+    goTo('view-seleccion');
+  }
+  (function(){
+    $('clave-form').addEventListener('submit', function(ev){
+      ev.preventDefault();
+      hashClave($('clave-input').value.trim()).then(function(h){
+        if(h !== CLAVE_HASH){ $('clave-err').classList.add('is-on'); $('clave-input').select(); return; }
+        claveOk = true;
+        if($('clave-recordar').checked){ try{ localStorage.setItem(CLAVE_KEY, CLAVE_HASH); }catch(e){} }
+        var cb = claveCallback; cerrarOverlayClave(); if(cb) cb();
+      });
+    });
+  })();
+
+  var LISTA_MODO = 'pend';
+  function abrirHoy(){ pedirClave(function(){ goTo('view-despacho-hoy'); cargarLista('pend'); }); }
   function cargarLista(modo){
+    LISTA_MODO = modo;
     $('tab-pend').classList.toggle('is-on', modo==='pend');
     $('tab-hoy').classList.toggle('is-on', modo==='hoy');
     $('hoy-lista').innerHTML = '<p class="hoy-empty">Cargando…</p>';
     if(!sb){ $('hoy-lista').innerHTML = '<p class="hoy-empty">Sin conexión.</p>'; return; }
     var q = sb.from('despachos_bins').select('*').order('created_at', {ascending:false});
-    q = modo==='pend' ? q.eq('estado','pendiente').limit(200) : q.eq('fecha', hoyStr()).limit(200);
+    q = modo==='pend' ? q.in('estado',['pendiente','aprobada']).limit(200) : q.eq('fecha', hoyStr()).limit(200);
     q.then(function(res){
       if(res.error){ $('hoy-lista').innerHTML = '<p class="hoy-empty">Error: '+esc(res.error.message)+'</p>'; return; }
       var d = res.data || [], t = {b:0,t:0,k:0};
@@ -1133,11 +1453,11 @@
       if(!d.length){ $('hoy-lista').innerHTML = '<p class="hoy-empty">'+(modo==='pend' ? 'No hay solicitudes pendientes 🎉' : 'Aún no hay despachos hoy.')+'</p>'; return; }
       $('hoy-lista').innerHTML = d.map(function(r){
         var em = r.estado === 'emitida';
-        return '<button class="hoy-item" type="button" onclick="mostrarDespacho(LISTA_CACHE['+r.id+'])">' +
+        return '<button class="hoy-item" type="button" onclick="mostrarDespacho(LISTA_CACHE['+r.id+'], \'gestion\'); enfocarGuia()">' +
           '<span class="hoy-num">N°'+r.id+'</span>' +
           '<span class="hoy-txt"><b>'+esc(r.especie)+' · C-'+esc(r.cuartel)+' · '+r.bins+' bins'+(r.totes ? ' / '+r.totes+' totes' : '')+'</b>' +
           '<small>'+(modo==='pend' ? fmtFecha(r.fecha)+' ' : '')+fmtHora(r.created_at)+' · '+esc(r.patente)+' · '+esc(r.planta)+'</small></span>' +
-          '<span class="estado '+(em?'emit':'pend')+'">'+(em ? 'Guía '+esc(r.numero_guia) : 'Pendiente')+'</span></button>';
+          '<span class="estado '+(em?'emit':(r.estado==='aprobada'?'apro':'pend'))+'">'+(em ? 'Guía '+esc(r.numero_guia) : (r.estado==='aprobada' ? '✓ Aprobada<br>falta N° guía' : 'Por aprobar'))+'</span></button>';
       }).join('');
     });
   }
@@ -1145,7 +1465,7 @@
   // ---- Contador de pendientes en el menú ----
   function actualizarPendientes(){
     if(!sb) return;
-    sb.from('despachos_bins').select('id', {count:'exact', head:true}).eq('estado','pendiente').then(function(res){
+    sb.from('despachos_bins').select('id', {count:'exact', head:true}).in('estado',['pendiente','aprobada']).then(function(res){
       var n = res.count || 0;
       $('pend-pill').textContent = n ? n + ' pendiente' + (n>1?'s':'') : '';
       $('tab-pend-n').textContent = n || '';
@@ -1181,7 +1501,7 @@
   // ---- Borradores genéricos ----
   function bindBorrador(formId, key, ids){
     var f = $(formId);
-    var save = function(){ var b = {}; ids.forEach(function(id){ b[id] = $(id).value; }); lsSet(key, b); };
+    var save = function(){ if(f._editando) return; var b = {}; ids.forEach(function(id){ b[id] = $(id).value; }); lsSet(key, b); };
     f.addEventListener('input', save); f.addEventListener('change', save);
     f._saveDraft = save;
     f._loadDraft = function(){ var b = lsGet(key) || {}; ids.forEach(function(id){ if(b[id] != null) $(id).value = b[id]; }); };
@@ -1234,8 +1554,8 @@
 
   // ---- Navegación ----
   function abrirRecepcion(){ goTo('view-recepcion'); actualizarDescuadres(); }
-  function abrirChofer(){ $('form-chofer')._loadDraft(); goTo('view-rec-chofer'); }
-  function abrirCampo(){ $('form-campo')._loadDraft(); cargarEnCamino(); goTo('view-rec-campo'); }
+  function abrirChofer(){ if($('form-chofer')._editando) salirEdicion('chofer'); $('form-chofer')._loadDraft(); goTo('view-rec-chofer'); }
+  function abrirCampo(){ if($('form-campo')._editando) salirEdicion('campo'); $('form-campo')._loadDraft(); cargarEnCamino(); goTo('view-rec-campo'); }
 
   function linkChofer(){ return location.origin + location.pathname + '?chofer'; }
   function compartirLinkChofer(){
@@ -1250,14 +1570,15 @@
     if(!rutValido($('c-rut').value)){ $('c-rut').classList.add('is-invalid'); alert('El RUT no es válido. Revísalo.'); return; }
     var bins = parseInt($('c-bins').value,10)||0, totes = parseInt($('c-totes').value,10)||0;
     if(bins + totes === 0){ alert('Ingresa la cantidad de bins o totes vacíos.'); return; }
-    if(!fotoChofer){ alert('Falta la foto de la guía.'); return; }
+    var editId = $('form-chofer')._editando;
+    if(!fotoChofer && !editId){ alert('Falta la foto de la guía.'); return; }
     if(!sb){ alert('Sin conexión. Intenta de nuevo cuando tengas señal; lo escrito no se pierde.'); return; }
 
     var btn = $('btn-chofer'); btn.disabled = true; btn.textContent = 'Subiendo foto…';
     subirFoto(fotoChofer, 'chofer').then(function(url){
+      var editId = $('form-chofer')._editando;
       btn.textContent = 'Guardando…';
-      return sb.from('recepcion_chofer').insert({
-        fecha: hoyStr(),
+      var reg = {
         chofer_nombre: $('c-nombre').value.trim(),
         chofer_rut: formatearRut($('c-rut').value),
         patente: normPat($('c-patente').value),
@@ -1267,11 +1588,23 @@
         bins: bins, totes: totes,
         tapas: parseInt($('c-tapas').value,10)||0,
         esponjas: parseInt($('c-esponjas').value,10)||0,
-        foto_guia_url: url,
         observaciones: $('c-obs').value.trim() || null
-      }).select().single();
+      };
+      if(url) reg.foto_guia_url = url;
+      if(editId){
+        reg.editado_at = new Date().toISOString();
+        return sb.from('recepcion_chofer').update(reg).eq('id', editId).select().single();
+      }
+      reg.fecha = hoyStr();
+      return sb.from('recepcion_chofer').insert(reg).select().single();
     }).then(function(res){
       if(res.error) throw res.error;
+      if(editId){
+        salirEdicion('chofer');
+        return sb.from('recepcion_cuadratura').select('*').eq('chofer_id', editId).single().then(function(r){
+          if(r.data) mostrarCruce(r.data, false); actualizarDescuadres();
+        });
+      }
       $('form-chofer')._clearDraft(); fotoChofer = null; $('c-foto-prev').innerHTML=''; $('c-foto-txt').textContent='Tomar o elegir foto';
       $('cruce-body').innerHTML =
         '<div class="ok-badge">✓</div><h2 class="ok-title">¡Enviado!</h2>' +
@@ -1282,7 +1615,7 @@
       goTo('view-cruce');
     }).catch(function(e){
       alert('No se pudo enviar: ' + (e.message || e) + '\nLo escrito no se pierde, intenta de nuevo.');
-    }).then(function(){ btn.disabled = false; btn.textContent = 'Enviar'; });
+    }).then(function(){ btn.disabled = false; btn.textContent = $('form-chofer')._editando ? 'Guardar cambios' : 'Enviar'; });
   }
 
   // ---- 2) Campo ----
@@ -1321,35 +1654,44 @@
     var guia = $('r-guia').value.trim();
 
     var btn = $('btn-campo'); btn.disabled = true; btn.textContent = 'Guardando…';
-    sb.from('recepcion_campo').select('id').eq('numero_guia', guia).limit(1).then(function(dup){
+    var editId = $('form-campo')._editando;
+    var qd = sb.from('recepcion_campo').select('id').eq('numero_guia', guia).limit(1);
+    if(editId) qd = qd.neq('id', editId);
+    qd.then(function(dup){
       if(dup.data && dup.data.length && !confirm('Ya hay una recepción registrada con la guía N° '+guia+'. ¿Registrar otra?')) throw {cancel:true};
       return subirFoto(fotoCampo, 'campo');
     }).then(function(url){
-      return sb.from('recepcion_campo').insert({
-        fecha: hoyStr(),
+      var reg = {
         encargada: $('r-encargada').value.trim(),
         patente: normPat($('r-patente').value),
         numero_guia: guia,
         bins: bins, totes: totes, bins_danados: dan,
         tapas: parseInt($('r-tapas').value,10)||0,
         esponjas: parseInt($('r-esponjas').value,10)||0,
-        foto_url: url,
         observaciones: $('r-obs').value.trim() || null
-      }).select().single();
+      };
+      if(url) reg.foto_url = url;
+      if(editId){
+        reg.editado_at = new Date().toISOString();
+        return sb.from('recepcion_campo').update(reg).eq('id', editId).select().single();
+      }
+      reg.fecha = hoyStr();
+      return sb.from('recepcion_campo').insert(reg).select().single();
     }).then(function(res){
       if(res.error) throw res.error;
+      if(editId){ salirEdicion('campo'); return sb.from('recepcion_cuadratura').select('*').eq('campo_id', editId).single(); }
       var enc = $('r-encargada').value;
       $('form-campo')._clearDraft(); $('r-encargada').value = enc; $('form-campo')._saveDraft();
       fotoCampo = null; $('r-foto-prev').innerHTML=''; $('r-foto-txt').textContent='Tomar o elegir foto';
       return sb.from('recepcion_cuadratura').select('*').eq('campo_id', res.data.id).single();
     }).then(function(res){
       if(res.error) throw res.error;
-      mostrarCruce(res.data, true);
+      mostrarCruce(res.data, !editId);
       actualizarDescuadres();
     }).catch(function(e){
       if(e && e.cancel) return;
       alert('No se pudo guardar: ' + (e.message || e) + '\nLo escrito no se pierde, intenta de nuevo.');
-    }).then(function(){ btn.disabled = false; btn.textContent = 'Guardar y cruzar'; });
+    }).then(function(){ btn.disabled = false; btn.textContent = $('form-campo')._editando ? 'Guardar cambios' : 'Guardar y cruzar'; });
   }
 
   // ---- Detalle del cruce ----
@@ -1396,15 +1738,24 @@
     h += '</div>';
 
     if(r.estado === 'descuadre'){
+      h += '<p class="form-card-title" style="color:#F2B8A6;margin-top:18px">¿Fue error de tipeo? Corrígelo aquí</p>';
+      if(r.chofer_id) h += '<button class="btn-save" type="button" style="margin-top:8px" onclick="editarRecepcion(\'chofer\','+r.chofer_id+')">✏️ Corregir lo del chofer</button>';
+      if(r.campo_id)  h += '<button class="btn-save" type="button" style="margin-top:8px" onclick="editarRecepcion(\'campo\','+r.campo_id+')">✏️ Corregir lo recibido en campo</button>';
+      h += '<p class="form-card-title" style="color:#8FD39B;margin-top:22px">Si el descuadre es real</p>';
       h += '<button class="btn-save btn-wsp" type="button" onclick="avisarDescuadre('+JSON.stringify(r.guia_norm).replace(/"/g,'&quot;')+')">Avisar descuadre por WhatsApp</button>';
       if(r.campo_id){
         h += '<div class="form-card"><p class="form-card-title"><span>✔️</span>Revisión</p>';
+        h += '<p class="stk-note" style="margin-top:6px">Úsalo solo si el descuadre es <b>real</b> (faltan o sobran bins de verdad). Si fue un error de tipeo, usa <b>✏️ Corregir</b> más arriba: al corregir, el descuadre desaparece.</p>';
         if(r.revisado) h += '<p class="cruce-nota" style="color:#235A34">Revisado: '+esc(r.revisado_nota||'sin nota')+'</p>';
         h += '<div class="field"><label for="rv-nota">Nota de revisión</label><textarea id="rv-nota" placeholder="Ej: chofer confirmó 2 bins quedaron en la exportadora">'+esc(r.revisado_nota||'')+'</textarea></div>';
         h += '<button class="btn-save" type="button" onclick="marcarRevisado('+r.campo_id+')">'+(r.revisado?'Actualizar nota':'Marcar descuadre como revisado')+'</button></div>';
       }
     }
     if(recienGuardado) h += '<button class="btn-ghost" type="button" onclick="abrirCampo()">Registrar otra recepción</button>';
+    if(r.estado !== 'descuadre'){
+      if(r.chofer_id) h += '<button class="btn-ghost" type="button" onclick="editarRecepcion(\'chofer\','+r.chofer_id+')">✏️ Editar registro del chofer</button>';
+      if(r.campo_id)  h += '<button class="btn-ghost" type="button" onclick="editarRecepcion(\'campo\','+r.campo_id+')">✏️ Editar recepción en campo</button>';
+    }
     h += '<button class="btn-ghost" type="button" onclick="abrirCuadratura(\'todos\')">Ver cuadratura</button>';
 
     CUAD_CACHE[r.guia_norm] = r;
@@ -1483,6 +1834,20 @@
   // ---- Eventos ----
   var MODO_CHOFER = /[?&]chofer\b/.test(location.search);
   (function(){
+    $('d-guia-file').addEventListener('change', function(){
+      var f = this.files && this.files[0]; guiaFile = f || null;
+      $('d-guia-file-txt').textContent = f ? '📄 ' + f.name : 'Adjuntar guía';
+    });
+    var m = location.search.match(/[?&]guia=(\d+)/);
+    if(m && sb){
+      pedirClave(function(){ sb.from('despachos_bins').select('*').eq('id', parseInt(m[1],10)).single().then(function(res){
+        if(res.error || !res.data){ alert('No se encontró la solicitud N° ' + m[1] + '.'); return; }
+        mostrarDespacho(res.data, 'gestion');
+        enfocarGuia();
+      }); });
+    }
+  })();
+  (function(){
     bindBorrador('form-chofer', 'rec_chofer_borrador_v1', IDS_CHOFER);
     bindBorrador('form-campo',  'rec_campo_borrador_v1',  IDS_CAMPO);
     bindFoto('c-foto','c-foto-prev','c-foto-txt', function(b){ fotoChofer = b; });
@@ -1524,9 +1889,10 @@
     var cols = 'id,created_at,fecha,solicitante,especie,cuartel,variedad,bins,totes,esponjas,kg_aprox,patente,chofer_nombre,chofer_rut,planta,exportadora,sello,estado,numero_guia,observaciones';
     Promise.all([
       sb.from('despachos_bins').select(cols).gte('fecha', desde).lte('fecha', hasta).order('created_at').limit(5000),
-      sb.from('recepcion_cuadratura').select('*').not('campo_id','is',null).gte('campo_fecha', desde).lte('campo_fecha', hasta).order('campo_at').limit(5000)
+      sb.from('recepcion_cuadratura').select('*').not('campo_id','is',null).gte('campo_fecha', desde).lte('campo_fecha', hasta).order('campo_at').limit(5000),
+      sb.from('devoluciones_bins').select('*').gte('fecha', desde).lte('fecha', hasta).order('created_at').limit(5000)
     ]).then(function(r){
-      if(r[0].error) throw r[0].error; if(r[1].error) throw r[1].error;
+      if(r[0].error) throw r[0].error; if(r[1].error) throw r[1].error; if(r[2].error) throw r[2].error;
       var movs = [];
       (r[0].data||[]).forEach(function(d){
         movs.push({ ts:d.created_at, fecha:d.fecha, tipo:'Salida', doc:'Solicitud N° '+d.id, guia:d.numero_guia||'',
@@ -1545,6 +1911,13 @@
           danados:c.bins_danados||0, responsable:c.encargada, cruce:(CRUCE[c.estado]||'') + (c.estado==='descuadre' && c.revisado ? ' (revisado)' : ''),
           obs:c.campo_obs||'' });
       });
+      (r[2].data||[]).forEach(function(v){
+        movs.push({ ts:v.created_at, fecha:v.fecha, tipo:'Devolución', doc:'Devolución N° '+v.id, guia:v.numero_guia||'',
+          estado_guia:'', patente:v.patente||'', chofer:v.chofer_nombre||'', rut:'', exportadora:v.exportadora, planta:v.planta||'',
+          especie:'', cuartel:'', variedad:'',
+          bins:-(v.bins||0), totes:-(v.totes||0), tapas:-(v.tapas||0), esponjas:-(v.esponjas||0), kg:'',
+          danados:'', responsable:v.responsable, cruce:'', obs:[v.motivo, v.observaciones].filter(Boolean).join(' · ') });
+      });
       movs.sort(function(a,b){ return a.ts < b.ts ? -1 : 1; });
       STOCK_MOVS = movs;
       pintarStock(desde, hasta);
@@ -1553,18 +1926,21 @@
 
   function totalesStock(movs){
     var t = {}; ['bins','totes','tapas','esponjas'].forEach(function(k){
-      t[k] = {sal:0, ent:0};
-      movs.forEach(function(m){ var v = m[k]||0; if(v<0) t[k].sal += v; else t[k].ent += v; });
+      t[k] = {des:0, dev:0, ent:0, sal:0};
+      movs.forEach(function(m){ var v = m[k]||0;
+        if(m.tipo==='Entrada') t[k].ent += v; else if(m.tipo==='Devolución') t[k].dev += v; else t[k].des += v; });
+      t[k].sal = t[k].des + t[k].dev;
     }); return t;
   }
   function sgn(n){ return n>0 ? '+'+fmtNum(n) : fmtNum(n); }
 
   function pintarStock(desde, hasta){
-    var t = totalesStock(STOCK_MOVS), nS = 0, nE = 0;
-    STOCK_MOVS.forEach(function(m){ m.tipo==='Salida' ? nS++ : nE++; });
+    var t = totalesStock(STOCK_MOVS), nS = 0, nE = 0, nD = 0;
+    STOCK_MOVS.forEach(function(m){ m.tipo==='Salida' ? nS++ : m.tipo==='Devolución' ? nD++ : nE++; });
     var row = function(lab, k){ var x = t[k]; return '<td>'+lab+'</td>'; };
     var h = '<div class="guia-card"><table class="stk-tab"><thead><tr><th></th><th>Bins</th><th>Totes</th><th>Tapas</th><th>Esponjas</th></tr></thead><tbody>';
-    h += '<tr><td>Salidas ('+nS+')</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ return '<td class="neg">'+sgn(t[k].sal)+'</td>'; }).join('') + '</tr>';
+    h += '<tr><td>Despachos ('+nS+')</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ return '<td class="neg">'+sgn(t[k].des)+'</td>'; }).join('') + '</tr>';
+    h += '<tr><td>Devoluciones ('+nD+')</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ return '<td class="neg">'+sgn(t[k].dev)+'</td>'; }).join('') + '</tr>';
     h += '<tr><td>Entradas ('+nE+')</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ return '<td class="pos">'+sgn(t[k].ent)+'</td>'; }).join('') + '</tr>';
     h += '<tr class="saldo"><td>Saldo</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ var s = t[k].sal + t[k].ent; return '<td class="'+(s<0?'neg':'pos')+'">'+sgn(s)+'</td>'; }).join('') + '</tr>';
     h += '</tbody></table>';
@@ -1595,7 +1971,8 @@
     var t = totalesStock(STOCK_MOVS);
     var tot = function(lab, f){ var r = new Array(cab.length).fill(''); r[0] = lab; ['bins','totes','tapas','esponjas'].forEach(function(k,i){ r[14+i] = f(t[k]); }); return r; };
     filas.push(new Array(cab.length).fill(''));
-    filas.push(tot('TOTAL SALIDAS', function(x){ return x.sal; }));
+    filas.push(tot('TOTAL DESPACHOS', function(x){ return x.des; }));
+    filas.push(tot('TOTAL DEVOLUCIONES', function(x){ return x.dev; }));
     filas.push(tot('TOTAL ENTRADAS', function(x){ return x.ent; }));
     filas.push(tot('SALDO', function(x){ return x.sal + x.ent; }));
 
@@ -1609,11 +1986,11 @@
       var k = m.exportadora || '(sin exportadora)';
       if(!porExp[k]) porExp[k] = {sb:0,eb:0,st:0,et:0,sp:0,ep:0,se:0,ee:0};
       var e = porExp[k];
-      if(m.tipo==='Salida'){ e.sb+=m.bins; e.st+=m.totes; e.sp+=m.tapas; e.se+=m.esponjas; }
+      if(m.tipo!=='Entrada'){ e.sb+=m.bins; e.st+=m.totes; e.sp+=m.tapas; e.se+=m.esponjas; }
       else { e.eb+=m.bins; e.et+=m.totes; e.ep+=m.tapas; e.ee+=m.esponjas; }
     });
     var res = [['Resumen por exportadora · ' + fmtFecha(desde) + ' al ' + fmtFecha(hasta)], [],
-      ['Exportadora','Bins salidas','Bins entradas','Saldo bins','Totes salidas','Totes entradas','Saldo totes','Tapas salidas','Tapas entradas','Saldo tapas','Esponjas salidas','Esponjas entradas','Saldo esponjas']];
+      ['Exportadora','Bins salidas (desp.+dev.)','Bins entradas','Saldo bins','Totes salidas (desp.+dev.)','Totes entradas','Saldo totes','Tapas salidas (desp.+dev.)','Tapas entradas','Saldo tapas','Esponjas salidas (desp.+dev.)','Esponjas entradas','Saldo esponjas']];
     Object.keys(porExp).sort().forEach(function(k){
       var e = porExp[k];
       res.push([k, e.sb, e.eb, e.sb+e.eb, e.st, e.et, e.st+e.et, e.sp, e.ep, e.sp+e.ep, e.se, e.ee, e.se+e.ee]);
@@ -1635,6 +2012,229 @@
       document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
     }
   }
+
+  // =====================================================================
+  //  EDICIÓN DE REGISTROS (corregir errores de tipeo)
+  // =====================================================================
+  var EDIT = { desp:null };
+  var EDIT_CFG = {
+    desp:   { form:'form-despacho', h:'h-desp',   btn:'btn-guardar-desp', cancel:'cancel-desp',
+              titulo:'Solicitud de guía de despacho', boton:'Guardar y generar solicitud', vista:'view-despacho' },
+    chofer: { form:'form-chofer',   h:'h-chofer', btn:'btn-chofer', cancel:'cancel-chofer',
+              titulo:'Bins vacíos que retiras', boton:'Enviar', vista:'view-rec-chofer' },
+    campo:  { form:'form-campo',    h:'h-campo',  btn:'btn-campo',  cancel:'cancel-campo',
+              titulo:'¿Qué llegó al campo?', boton:'Guardar y cruzar', vista:'view-rec-campo' }
+  };
+  function entrarEdicion(tipo, id){
+    var c = EDIT_CFG[tipo];
+    if(tipo==='desp') EDIT.desp = id; else $(c.form)._editando = id;
+    $(c.h).textContent = '✏️ Editando registro N° ' + id;
+    $(c.btn).textContent = 'Guardar cambios';
+    $(c.cancel).style.display = '';
+    if(tipo==='campo') $('encamino-wrap').style.display = 'none';
+  }
+  function salirEdicion(tipo){
+    var c = EDIT_CFG[tipo];
+    if(tipo==='desp') EDIT.desp = null; else $(c.form)._editando = null;
+    $(c.h).textContent = c.titulo;
+    $(c.btn).textContent = c.boton;
+    $(c.cancel).style.display = 'none';
+    // vuelve a dejar en el formulario el borrador que había antes de editar
+    if(tipo==='desp'){ CAMPOS_DESP.forEach(function(id){ $(id).value = ($(id).type==='number' && id!=='d-kg') ? '0' : ''; }); cargarBorrador(); }
+    else { var f = $(c.form); var ids = tipo==='chofer' ? IDS_CHOFER : IDS_CAMPO;
+           if(tipo==='dev') ids = IDS_DEV;
+           ids.forEach(function(id){ $(id).value = $(id).type==='number' ? '0' : ''; }); f._loadDraft(); }
+    if(tipo==='dev'){ fotoDev = null; $('v-foto-prev').innerHTML=''; $('v-foto-txt').textContent='Tomar o elegir foto'; }
+    if(tipo==='chofer'){ fotoChofer = null; $('c-foto-prev').innerHTML=''; $('c-foto-txt').textContent='Tomar o elegir foto'; }
+    if(tipo==='campo'){ fotoCampo = null; $('r-foto-prev').innerHTML=''; $('r-foto-txt').textContent='Tomar o elegir foto'; }
+  }
+  function cancelarEdicion(tipo){
+    salirEdicion(tipo);
+    goTo(tipo==='desp' ? 'view-despacho-ok' : 'view-cruce');
+  }
+  function mostrarFotoActual(prevId, txtId, url){
+    if(!url) return;
+    $(prevId).innerHTML = '<img src="'+esc(url)+'" alt=""><span class="hint" style="font-size:12px;color:var(--ink-soft)">Foto actual. Puedes cambiarla.</span>';
+    $(txtId).textContent = 'Cambiar foto';
+  }
+  function editarDespacho(){
+    var d = despachoActual; if(!d) return;
+    if(d.estado==='emitida' && !confirm('Esta guía ya fue emitida en el SII (N° '+(d.numero_guia||'')+'). Corregir aquí no cambia la guía emitida. ¿Editar igual?')) return;
+    var m = { 'd-solicitante':d.solicitante, 'd-cuartel':d.cuartel, 'd-especie':d.especie, 'd-variedad':d.variedad,
+      'd-csg':d.csg, 'd-sdp':d.sdp, 'd-bins':d.bins, 'd-totes':d.totes, 'd-kg':d.kg_aprox, 'd-esponjas':d.esponjas,
+      'd-chofer':d.chofer_nombre, 'd-rut':d.chofer_rut, 'd-patente':d.patente, 'd-sello':d.sello,
+      'd-planta':d.planta, 'd-exportadora':d.exportadora, 'd-obs':d.observaciones };
+    entrarEdicion('desp', d.id);
+    Object.keys(m).forEach(function(id){ $(id).value = m[id]==null ? '' : m[id]; });
+    $('d-rut').classList.remove('is-invalid');
+    goTo('view-despacho');
+  }
+  function editarRecepcion(tipo, id){
+    if(!sb) return;
+    var tabla = tipo==='chofer' ? 'recepcion_chofer' : 'recepcion_campo';
+    sb.from(tabla).select('*').eq('id', id).single().then(function(res){
+      if(res.error || !res.data){ alert('No se pudo cargar el registro: ' + (res.error ? res.error.message : '')); return; }
+      var r = res.data, m;
+      if(tipo==='chofer'){
+        m = { 'c-nombre':r.chofer_nombre, 'c-rut':r.chofer_rut, 'c-patente':r.patente, 'c-exportadora':r.exportadora,
+              'c-planta':r.planta, 'c-guia':r.numero_guia, 'c-bins':r.bins, 'c-totes':r.totes, 'c-tapas':r.tapas,
+              'c-esponjas':r.esponjas, 'c-obs':r.observaciones };
+      } else {
+        m = { 'r-encargada':r.encargada, 'r-patente':r.patente, 'r-guia':r.numero_guia, 'r-bins':r.bins, 'r-totes':r.totes,
+              'r-tapas':r.tapas, 'r-esponjas':r.esponjas, 'r-danados':r.bins_danados, 'r-obs':r.observaciones };
+      }
+      entrarEdicion(tipo, id);
+      Object.keys(m).forEach(function(k){ $(k).value = m[k]==null ? '' : m[k]; });
+      if(tipo==='chofer'){ fotoChofer = null; $('c-foto-prev').innerHTML=''; mostrarFotoActual('c-foto-prev','c-foto-txt', r.foto_guia_url); $('c-rut').classList.remove('is-invalid'); }
+      else { fotoCampo = null; $('r-foto-prev').innerHTML=''; mostrarFotoActual('r-foto-prev','r-foto-txt', r.foto_url); }
+      goTo(EDIT_CFG[tipo].vista);
+    });
+  }
+
+  // =====================================================================
+  //  DEVOLUCIÓN DE MATERIAL (sale del campo → se descuenta del stock)
+  // =====================================================================
+  var fotoDev = null, DEV_CACHE = {};
+  var IDS_DEV = ['v-responsable','v-exportadora','v-planta','v-motivo','v-bins','v-totes','v-tapas','v-esponjas','v-guia','v-patente','v-chofer','v-obs'];
+  EDIT_CFG.dev = { form:'form-dev', h:'h-dev', btn:'btn-dev', cancel:'cancel-dev',
+                   titulo:'Material que sale del campo', boton:'Registrar devolución', vista:'view-devolucion' };
+
+  function abrirDevolucion(){
+    if($('form-dev')._editando) salirEdicion('dev');
+    $('form-dev')._loadDraft();
+    goTo('view-devolucion');
+  }
+
+  function guardarDevolucion(ev){
+    ev.preventDefault();
+    if(!validarRequeridos('form-dev')) return;
+    var n = function(id){ return parseInt($(id).value,10)||0; };
+    var bins = n('v-bins'), totes = n('v-totes'), tapas = n('v-tapas'), esp = n('v-esponjas');
+    if(bins + totes + tapas + esp === 0){ alert('Ingresa la cantidad de material que se devuelve.'); return; }
+    if(!sb){ alert('Sin conexión. Intenta de nuevo; lo escrito no se pierde.'); return; }
+    var editId = $('form-dev')._editando;
+    var btn = $('btn-dev'); btn.disabled = true; btn.textContent = 'Guardando…';
+    subirFoto(fotoDev, 'devolucion').then(function(url){
+      var reg = {
+        responsable: $('v-responsable').value.trim(),
+        exportadora: $('v-exportadora').value.trim(),
+        planta: $('v-planta').value.trim() || null,
+        motivo: $('v-motivo').value,
+        numero_guia: $('v-guia').value.trim() || null,
+        patente: normPat($('v-patente').value) || null,
+        chofer_nombre: $('v-chofer').value.trim() || null,
+        bins: bins, totes: totes, tapas: tapas, esponjas: esp,
+        observaciones: $('v-obs').value.trim() || null
+      };
+      if(url) reg.foto_url = url;
+      if(editId){ reg.editado_at = new Date().toISOString(); return sb.from('devoluciones_bins').update(reg).eq('id', editId).select().single(); }
+      reg.fecha = hoyStr();
+      return sb.from('devoluciones_bins').insert(reg).select().single();
+    }).then(function(res){
+      if(res.error) throw res.error;
+      if(editId) salirEdicion('dev');
+      else {
+        var resp = $('v-responsable').value;
+        $('form-dev')._clearDraft(); $('v-responsable').value = resp; $('form-dev')._saveDraft();
+        fotoDev = null; $('v-foto-prev').innerHTML=''; $('v-foto-txt').textContent='Tomar o elegir foto';
+      }
+      mostrarDevolucion(res.data, !editId);
+    }).catch(function(e){
+      alert('No se pudo guardar: ' + (e.message || e) + '\nLo escrito no se pierde, intenta de nuevo.');
+    }).then(function(){ btn.disabled = false; btn.textContent = $('form-dev')._editando ? 'Guardar cambios' : 'Registrar devolución'; });
+  }
+
+  function mostrarDevolucion(d, recien){
+    DEV_CACHE[d.id] = d;
+    var h = '<div class="ok-badge" style="background:#E8A23D;color:#3A1E05">↩</div>';
+    h += '<h2 class="ok-title">'+(recien ? 'Devolución registrada' : 'Devolución N° '+d.id)+'</h2>';
+    h += '<p class="ok-sub">Se descuenta del stock en campo</p>';
+    h += '<div class="guia-card"><div class="guia-head"><b>Devolución N° '+d.id+'</b><span>'+fmtFecha(d.fecha)+' · '+fmtHora(d.created_at)+'</span></div>';
+    h += '<table class="cruce-tab"><thead><tr><th></th><th>Bins</th><th>Totes</th><th>Tapas</th><th>Esponjas</th></tr></thead><tbody>';
+    h += '<tr><td>Devuelto</td><td>−'+d.bins+'</td><td>−'+d.totes+'</td><td>−'+d.tapas+'</td><td>−'+d.esponjas+'</td></tr></tbody></table>';
+    h += fila('Responsable', d.responsable) + fila('Exportadora', d.exportadora) + fila('Planta', d.planta) + fila('Motivo', d.motivo) +
+         fila('N° guía', d.numero_guia) + fila('Patente', d.patente) + fila('Chofer', d.chofer_nombre) + fila('Obs.', d.observaciones) +
+         (d.editado_at ? fila('Corregido', fmtFecha(d.editado_at)+' '+fmtHora(d.editado_at)) : '');
+    if(d.foto_url) h += '<a href="'+esc(d.foto_url)+'" target="_blank" rel="noopener"><img class="cruce-foto" src="'+esc(d.foto_url)+'" alt="Foto"></a>';
+    h += '</div>';
+    h += '<button class="btn-ghost" type="button" onclick="editarDevolucion('+d.id+')">✏️ Corregir devolución</button>';
+    if(recien) h += '<button class="btn-ghost" type="button" onclick="abrirDevolucion()">Registrar otra devolución</button>';
+    h += '<button class="btn-ghost" type="button" onclick="abrirListaDev()">Ver devoluciones</button>';
+    $('cruce-body').innerHTML = h;
+    $('back-cruce').onclick = function(){ recien ? goTo('view-seleccion') : abrirListaDev(); };
+    goTo('view-cruce');
+  }
+
+  function editarDevolucion(id){
+    var d = DEV_CACHE[id]; if(!d) return;
+    var m = { 'v-responsable':d.responsable, 'v-exportadora':d.exportadora, 'v-planta':d.planta, 'v-motivo':d.motivo,
+              'v-bins':d.bins, 'v-totes':d.totes, 'v-tapas':d.tapas, 'v-esponjas':d.esponjas,
+              'v-guia':d.numero_guia, 'v-patente':d.patente, 'v-chofer':d.chofer_nombre, 'v-obs':d.observaciones };
+    entrarEdicion('dev', id);
+    Object.keys(m).forEach(function(k){ $(k).value = m[k]==null ? '' : m[k]; });
+    fotoDev = null; $('v-foto-prev').innerHTML=''; mostrarFotoActual('v-foto-prev','v-foto-txt', d.foto_url);
+    goTo('view-devolucion');
+  }
+
+  function abrirListaDev(){
+    goTo('view-dev-lista');
+    $('dev-lista').innerHTML = '<p class="hoy-empty">Cargando…</p>';
+    if(!sb){ $('dev-lista').innerHTML = '<p class="hoy-empty">Sin conexión.</p>'; return; }
+    sb.from('devoluciones_bins').select('*').order('created_at',{ascending:false}).limit(200).then(function(res){
+      if(res.error){ $('dev-lista').innerHTML = '<p class="hoy-empty">Error: '+esc(res.error.message)+'</p>'; return; }
+      var d = res.data || [];
+      if(!d.length){ $('dev-lista').innerHTML = '<p class="hoy-empty">Aún no hay devoluciones.</p>'; return; }
+      $('dev-lista').innerHTML = d.map(function(r){
+        DEV_CACHE[r.id] = r;
+        var mat = [];
+        if(r.bins) mat.push(r.bins+' bins'); if(r.totes) mat.push(r.totes+' totes');
+        if(r.tapas) mat.push(r.tapas+' tapas'); if(r.esponjas) mat.push(r.esponjas+' esponjas');
+        return '<button class="hoy-item" type="button" onclick="mostrarDevolucion(DEV_CACHE['+r.id+'],false)">' +
+          '<span class="hoy-num" style="background:#FBE7CC;color:#8A4A10">↩</span>' +
+          '<span class="hoy-txt"><b>'+esc(mat.join(' · '))+'</b>' +
+          '<small>'+fmtFecha(r.fecha)+' '+fmtHora(r.created_at)+' · '+esc(r.exportadora)+' · '+esc(r.motivo)+'</small></span>' +
+          '<span class="estado pend">N° '+r.id+'</span></button>';
+      }).join('');
+    });
+  }
+
+  (function(){
+    bindBorrador('form-dev', 'devolucion_borrador_v1', IDS_DEV);
+    bindFoto('v-foto','v-foto-prev','v-foto-txt', function(b){ fotoDev = b; });
+    $('form-dev').addEventListener('submit', guardarDevolucion);
+    $('v-patente').addEventListener('input', function(){ this.value = this.value.toUpperCase(); });
+  })();
+
+  // =====================================================================
+  //  AVISOS EN VIVO (cuando se aprueba o se emite una guía)
+  // =====================================================================
+  var AVISADOS = {};
+  function toast(titulo, sub){
+    var el = $('toast'); el.innerHTML = esc(titulo) + (sub ? '<small>' + esc(sub) + '</small>' : '');
+    el.classList.add('is-on'); clearTimeout(el._t); el._t = setTimeout(function(){ el.classList.remove('is-on'); }, 7000);
+  }
+  function reciente(ts){ return ts && (Date.now() - new Date(ts).getTime()) < 3*60*1000; }
+  (function(){
+    if(!sb || !sb.channel) return;
+    sb.channel('despachos-bins-live')
+      .on('postgres_changes', {event:'*', schema:'public', table:'despachos_bins'}, function(p){
+        var n = p.new || {};
+        if(n.id){
+          var key = n.id + ':' + n.estado;
+          if(!AVISADOS[key]){
+            if(n.estado === 'aprobada' && reciente(n.aprobada_at)){ AVISADOS[key] = 1; toast('✓ Solicitud N° ' + n.id + ' aprobada', 'Por ' + (n.aprobado_por || '') + ' · ' + n.bins + ' bins · ' + (n.patente || '')); }
+            else if(n.estado === 'emitida' && reciente(n.emitida_at)){ AVISADOS[key] = 1; toast('🧾 Guía N° ' + n.numero_guia + ' emitida', 'Solicitud N° ' + n.id + ' · ' + (n.patente || '')); }
+            else if(p.eventType === 'INSERT' && claveOk){ AVISADOS[key] = 1; toast('🆕 Nueva solicitud N° ' + n.id, n.especie + ' · ' + n.bins + ' bins · ' + (n.patente || '')); }
+          }
+          if(despachoActual && despachoActual.id === n.id && document.getElementById('view-despacho-ok').classList.contains('is-active')){
+            if(!(EDIT && EDIT.desp)) mostrarDespacho(n);
+          }
+        }
+        if(document.getElementById('view-despacho-hoy').classList.contains('is-active')) cargarLista(LISTA_MODO);
+        actualizarPendientes();
+      })
+      .subscribe();
+  })();
 </script>
 </body>
 </html>
