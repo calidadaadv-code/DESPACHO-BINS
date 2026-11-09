@@ -332,6 +332,9 @@
   .stk-tab td:first-child{ font-family:'Inter',sans-serif; font-weight:500; color:var(--ink-soft); }
   .stk-tab .neg{ color:#B0381E; } .stk-tab .pos{ color:#235A34; }
   .stk-tab tr.saldo td{ border-top:2px solid rgba(20,33,28,0.2); font-weight:700; font-size:15px; }
+  .stk-campo{ margin:0 0 8px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; color:var(--ink); }
+  .stk-total{ border:2px solid #4FA65B; }
+  .stk-sin{ opacity:0.85; border:1.5px dashed #E0623D; }
   .stk-note{ margin:10px 0 0; font-size:12.5px; color:var(--ink-soft); }
 </style>
 </head>
@@ -426,11 +429,6 @@
           <span class="option-text"><p class="option-title">Stock de bins</p><p class="option-sub">Saldo y Excel de movimientos (− salidas / + entradas)</p></span>
           <span class="option-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
         </button>
-        <button class="option-card option-card--vivid card-inf" type="button" onclick="abrirModulo('Informes','Resumen de despachos por día, cuartel y especie, descargable y para compartir.')">
-          <span class="option-icon-vivid">📊</span>
-          <span class="option-text"><p class="option-title">Informes</p><p class="option-sub">Resumen descargable para jefaturas</p></span>
-          <span class="option-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-        </button>
       </div>
 
       <p class="foot-note">Fundo Lo Ovalle · Agrícola Agua del Valle SPA</p>
@@ -462,6 +460,14 @@
 
         <div class="form-card">
           <p class="form-card-title"><span>🍑</span>Origen de la fruta</p>
+          <div class="field">
+            <label for="d-campo">Campo <span class="req">*</span></label>
+            <select id="d-campo" required>
+              <option value="">Elegir…</option>
+              <option>San Gregorio</option>
+              <option>San Lorenzo - Santa Emilia</option>
+            </select>
+          </div>
           <div class="field-row">
             <div class="field">
               <label for="d-cuartel">Cuartel <span class="req">*</span></label>
@@ -778,6 +784,14 @@
         <div class="form-card">
           <p class="form-card-title"><span>🚚</span>Identificación</p>
           <div class="field">
+            <label for="r-campo">Campo donde se recibe <span class="req">*</span></label>
+            <select id="r-campo" required>
+              <option value="">Elegir…</option>
+              <option>San Gregorio</option>
+              <option>San Lorenzo - Santa Emilia</option>
+            </select>
+          </div>
+          <div class="field">
             <label for="r-encargada">Encargada de despacho <span class="req">*</span></label>
             <input type="text" id="r-encargada" required>
           </div>
@@ -904,6 +918,14 @@
       <form id="form-dev" autocomplete="off" novalidate>
         <div class="form-card">
           <p class="form-card-title"><span>👤</span>Responsable y destino</p>
+          <div class="field">
+            <label for="v-campo">Campo desde donde sale <span class="req">*</span></label>
+            <select id="v-campo" required>
+              <option value="">Elegir…</option>
+              <option>San Gregorio</option>
+              <option>San Lorenzo - Santa Emilia</option>
+            </select>
+          </div>
           <div class="field">
             <label for="v-responsable">Responsable <span class="req">*</span></label>
             <input type="text" id="v-responsable" required>
@@ -1081,7 +1103,7 @@
   var EXPORTADORAS = [];
 
 
-  var CAMPOS_DESP = ['d-solicitante','d-cuartel','d-especie','d-variedad','d-csg','d-sdp','d-bins','d-totes',
+  var CAMPOS_DESP = ['d-campo','d-solicitante','d-cuartel','d-especie','d-variedad','d-csg','d-sdp','d-bins','d-totes',
     'd-kg','d-esponjas','d-chofer','d-rut','d-patente','d-sello','d-planta','d-exportadora','d-obs'];
   var BORRADOR_KEY = 'despacho_borrador_v1';
   var RECORDAR = []; // cada despacho se llena completo
@@ -1186,6 +1208,7 @@
 
     var reg = {
       fecha: hoyStr(),
+      campo: $('d-campo').value,
       solicitante: $('d-solicitante').value.trim(),
       especie: $('d-especie').value,
       cuartel: $('d-cuartel').value.trim().toUpperCase(),
@@ -1235,7 +1258,7 @@
       (emitida ? fila('N° guía SII', d.numero_guia) : '') +
       (d.guia_archivo_url ? '<div class="guia-row"><span>Archivo guía</span><span><a href="'+esc(d.guia_archivo_url)+'" target="_blank" rel="noopener">Ver guía ↗</a></span></div>' : '') +
       '<p class="guia-sec">Origen</p>' +
-      fila('Especie', d.especie) + fila('Cuartel', d.cuartel) + fila('Variedad', d.variedad) +
+      fila('Campo', d.campo) + fila('Especie', d.especie) + fila('Cuartel', d.cuartel) + fila('Variedad', d.variedad) +
       fila('CSG', d.csg) + fila('SDP', d.sdp) +
       '<p class="guia-sec">Carga</p>' +
       fila('Bins con fruta', fmtNum(d.bins)) + fila('Totes con fruta', fmtNum(d.totes)) +
@@ -1275,6 +1298,7 @@
     L.push('Solicita: ' + d.solicitante);
     L.push('');
     L.push('*Origen*');
+    if(d.campo) L.push('Campo: ' + d.campo);
     L.push('Especie: ' + d.especie + ' · Variedad: ' + d.variedad);
     L.push('Cuartel: ' + d.cuartel);
     if(d.csg) L.push('CSG: ' + d.csg);
@@ -1366,6 +1390,7 @@
       actualizarPendientes();
       setTimeout(function(){ $('paso3').scrollIntoView({behavior:'smooth', block:'center'}); }, 50);
     }).catch(function(e){
+      if(esDuplicado(e)){ alert('⚠ La guía N° ' + n + ' ya está asignada a otra solicitud de despacho. Revisa el número.'); return; }
       alert('No se pudo guardar: ' + (e.message || e));
     }).then(function(){ btn.disabled = false; btn.textContent = despachoActual && despachoActual.estado==='emitida' ? 'Actualizar guía emitida' : 'Guardar guía emitida'; });
   }
@@ -1508,7 +1533,7 @@
     f._clearDraft = function(){ lsSet(key, {}); ids.forEach(function(id){ $(id).value = $(id).type==='number' ? '0' : ''; }); };
   }
   var IDS_CHOFER = ['c-nombre','c-rut','c-patente','c-exportadora','c-planta','c-guia','c-bins','c-totes','c-tapas','c-esponjas','c-obs'];
-  var IDS_CAMPO  = ['r-encargada','r-patente','r-guia','r-bins','r-totes','r-tapas','r-esponjas','r-danados','r-obs'];
+  var IDS_CAMPO  = ['r-campo','r-encargada','r-patente','r-guia','r-bins','r-totes','r-tapas','r-esponjas','r-danados','r-obs'];
 
   // ---- Fotos: compresión a ~1600px JPEG ----
   function comprimirFoto(file, cb){
@@ -1574,8 +1599,13 @@
     if(!fotoChofer && !editId){ alert('Falta la foto de la guía.'); return; }
     if(!sb){ alert('Sin conexión. Intenta de nuevo cuando tengas señal; lo escrito no se pierde.'); return; }
 
-    var btn = $('btn-chofer'); btn.disabled = true; btn.textContent = 'Subiendo foto…';
-    subirFoto(fotoChofer, 'chofer').then(function(url){
+    var btn = $('btn-chofer'); btn.disabled = true; btn.textContent = 'Revisando guía…';
+    var guiaCh = $('c-guia').value.trim();
+    guiaYaExiste('chofer', guiaCh, editId).then(function(existe){
+      if(existe){ alert(msgGuiaDuplicada(guiaCh, 'por un chofer')); throw {cancel:true}; }
+      btn.textContent = 'Subiendo foto…';
+      return subirFoto(fotoChofer, 'chofer');
+    }).then(function(url){
       var editId = $('form-chofer')._editando;
       btn.textContent = 'Guardando…';
       var reg = {
@@ -1600,8 +1630,11 @@
     }).then(function(res){
       if(res.error) throw res.error;
       if(editId){
+        var fc = $('form-chofer'), parC = fc._pareja, gOldC = fc._guiaOrig;
         salirEdicion('chofer');
-        return sb.from('recepcion_cuadratura').select('*').eq('chofer_id', editId).single().then(function(r){
+        return sincronizarGuia('recepcion_campo', parC, gOldC, res.data.numero_guia).then(function(){
+          return sb.from('recepcion_cuadratura').select('*').eq('chofer_id', editId).single();
+        }).then(function(r){
           if(r.data) mostrarCruce(r.data, false); actualizarDescuadres();
         });
       }
@@ -1614,6 +1647,8 @@
       $('back-cruce').onclick = function(){ goTo(MODO_CHOFER ? 'view-rec-chofer' : 'view-recepcion'); };
       goTo('view-cruce');
     }).catch(function(e){
+      if(e && e.cancel) return;
+      if(esDuplicado(e)){ alert(msgGuiaDuplicada($('c-guia').value.trim(), 'por un chofer')); return; }
       alert('No se pudo enviar: ' + (e.message || e) + '\nLo escrito no se pierde, intenta de nuevo.');
     }).then(function(){ btn.disabled = false; btn.textContent = $('form-chofer')._editando ? 'Guardar cambios' : 'Enviar'; });
   }
@@ -1655,13 +1690,12 @@
 
     var btn = $('btn-campo'); btn.disabled = true; btn.textContent = 'Guardando…';
     var editId = $('form-campo')._editando;
-    var qd = sb.from('recepcion_campo').select('id').eq('numero_guia', guia).limit(1);
-    if(editId) qd = qd.neq('id', editId);
-    qd.then(function(dup){
-      if(dup.data && dup.data.length && !confirm('Ya hay una recepción registrada con la guía N° '+guia+'. ¿Registrar otra?')) throw {cancel:true};
+    guiaYaExiste('campo', guia, editId).then(function(existe){
+      if(existe){ alert(msgGuiaDuplicada(guia, 'en la recepción en campo')); throw {cancel:true}; }
       return subirFoto(fotoCampo, 'campo');
     }).then(function(url){
       var reg = {
+        campo: $('r-campo').value,
         encargada: $('r-encargada').value.trim(),
         patente: normPat($('r-patente').value),
         numero_guia: guia,
@@ -1679,7 +1713,13 @@
       return sb.from('recepcion_campo').insert(reg).select().single();
     }).then(function(res){
       if(res.error) throw res.error;
-      if(editId){ salirEdicion('campo'); return sb.from('recepcion_cuadratura').select('*').eq('campo_id', editId).single(); }
+      if(editId){
+        var fr = $('form-campo'), parR = fr._pareja, gOldR = fr._guiaOrig;
+        salirEdicion('campo');
+        return sincronizarGuia('recepcion_chofer', parR, gOldR, res.data.numero_guia).then(function(){
+          return sb.from('recepcion_cuadratura').select('*').eq('campo_id', editId).single();
+        });
+      }
       var enc = $('r-encargada').value;
       $('form-campo')._clearDraft(); $('r-encargada').value = enc; $('form-campo')._saveDraft();
       fotoCampo = null; $('r-foto-prev').innerHTML=''; $('r-foto-txt').textContent='Tomar o elegir foto';
@@ -1690,6 +1730,7 @@
       actualizarDescuadres();
     }).catch(function(e){
       if(e && e.cancel) return;
+      if(esDuplicado(e)){ alert(msgGuiaDuplicada(guia, 'en la recepción en campo')); return; }
       alert('No se pudo guardar: ' + (e.message || e) + '\nLo escrito no se pierde, intenta de nuevo.');
     }).then(function(){ btn.disabled = false; btn.textContent = $('form-campo')._editando ? 'Guardar cambios' : 'Guardar y cruzar'; });
   }
@@ -1731,7 +1772,7 @@
       if(r.foto_guia_url) h += '<a href="'+esc(r.foto_guia_url)+'" target="_blank" rel="noopener"><img class="cruce-foto" src="'+esc(r.foto_guia_url)+'" alt="Foto de la guía"></a>';
     }
     if(r.campo_id){
-      h += '<p class="guia-sec">Recepción en campo</p>' + fila('Encargada', r.encargada) +
+      h += '<p class="guia-sec">Recepción en campo</p>' + fila('Campo', r.campo) + fila('Encargada', r.encargada) +
            fila('Recibido', fmtFecha(r.campo_at)+' '+fmtHora(r.campo_at)) + fila('Obs.', r.campo_obs);
       if(r.campo_foto_url) h += '<a href="'+esc(r.campo_foto_url)+'" target="_blank" rel="noopener"><img class="cruce-foto" src="'+esc(r.campo_foto_url)+'" alt="Foto recepción"></a>';
     }
@@ -1886,7 +1927,7 @@
     if(!desde || !hasta || desde > hasta){ alert('Revisa las fechas del periodo.'); return; }
     if(!sb){ $('stock-res').innerHTML = '<p class="hoy-empty">Sin conexión.</p>'; return; }
     $('stock-res').innerHTML = '<p class="hoy-empty">Cargando…</p>';
-    var cols = 'id,created_at,fecha,solicitante,especie,cuartel,variedad,bins,totes,esponjas,kg_aprox,patente,chofer_nombre,chofer_rut,planta,exportadora,sello,estado,numero_guia,observaciones';
+    var cols = 'id,campo,created_at,fecha,solicitante,especie,cuartel,variedad,bins,totes,esponjas,kg_aprox,patente,chofer_nombre,chofer_rut,planta,exportadora,sello,estado,numero_guia,observaciones';
     Promise.all([
       sb.from('despachos_bins').select(cols).gte('fecha', desde).lte('fecha', hasta).order('created_at').limit(5000),
       sb.from('recepcion_cuadratura').select('*').not('campo_id','is',null).gte('campo_fecha', desde).lte('campo_fecha', hasta).order('campo_at').limit(5000),
@@ -1895,7 +1936,7 @@
       if(r[0].error) throw r[0].error; if(r[1].error) throw r[1].error; if(r[2].error) throw r[2].error;
       var movs = [];
       (r[0].data||[]).forEach(function(d){
-        movs.push({ ts:d.created_at, fecha:d.fecha, tipo:'Salida', doc:'Solicitud N° '+d.id, guia:d.numero_guia||'',
+        movs.push({ campo:d.campo||'', ts:d.created_at, fecha:d.fecha, tipo:'Salida', doc:'Solicitud N° '+d.id, guia:d.numero_guia||'',
           estado_guia: d.estado==='emitida' ? 'Emitida' : 'Pendiente',
           patente:d.patente, chofer:d.chofer_nombre, rut:d.chofer_rut, exportadora:d.exportadora, planta:d.planta,
           especie:d.especie, cuartel:d.cuartel, variedad:d.variedad,
@@ -1904,7 +1945,7 @@
       });
       var CRUCE = {cuadrado:'Cuadrado', descuadre:'Descuadre', sin_chofer:'Sin registro chofer', en_camino:'En camino'};
       (r[1].data||[]).forEach(function(c){
-        movs.push({ ts:c.campo_at, fecha:c.campo_fecha, tipo:'Entrada', doc:'Recepción campo', guia:c.numero_guia,
+        movs.push({ campo:c.campo||'', ts:c.campo_at, fecha:c.campo_fecha, tipo:'Entrada', doc:'Recepción campo', guia:c.numero_guia,
           estado_guia:'', patente:c.campo_patente, chofer:c.chofer_nombre||'', rut:c.chofer_rut||'', exportadora:c.exportadora||'', planta:c.planta||'',
           especie:'', cuartel:'', variedad:'',
           bins:c.campo_bins||0, totes:c.campo_totes||0, tapas:c.campo_tapas||0, esponjas:c.campo_esponjas||0, kg:'',
@@ -1912,7 +1953,7 @@
           obs:c.campo_obs||'' });
       });
       (r[2].data||[]).forEach(function(v){
-        movs.push({ ts:v.created_at, fecha:v.fecha, tipo:'Devolución', doc:'Devolución N° '+v.id, guia:v.numero_guia||'',
+        movs.push({ campo:v.campo||'', ts:v.created_at, fecha:v.fecha, tipo:'Devolución', doc:'Devolución N° '+v.id, guia:v.numero_guia||'',
           estado_guia:'', patente:v.patente||'', chofer:v.chofer_nombre||'', rut:'', exportadora:v.exportadora, planta:v.planta||'',
           especie:'', cuartel:'', variedad:'',
           bins:-(v.bins||0), totes:-(v.totes||0), tapas:-(v.tapas||0), esponjas:-(v.esponjas||0), kg:'',
@@ -1934,17 +1975,33 @@
   }
   function sgn(n){ return n>0 ? '+'+fmtNum(n) : fmtNum(n); }
 
+  var CAMPOS = ['San Gregorio', 'San Lorenzo - Santa Emilia'];
+  function gruposCampo(movs){
+    var g = CAMPOS.map(function(c){ return {nombre:c, movs:movs.filter(function(m){ return m.campo === c; })}; });
+    var sin = movs.filter(function(m){ return CAMPOS.indexOf(m.campo) < 0; });
+    if(sin.length) g.push({nombre:'Sin campo asignado', movs:sin, sin:true});
+    return g;
+  }
+  function tablaStock(movs, titulo, extraCls){
+    var t = totalesStock(movs), nS = 0, nE = 0, nD = 0;
+    movs.forEach(function(m){ m.tipo==='Salida' ? nS++ : m.tipo==='Devolución' ? nD++ : nE++; });
+    var K = ['bins','totes','tapas','esponjas'];
+    var h = '<div class="guia-card'+(extraCls||'')+'"><p class="stk-campo">'+esc(titulo)+'</p>';
+    h += '<table class="stk-tab"><thead><tr><th></th><th>Bins</th><th>Totes</th><th>Tapas</th><th>Esponjas</th></tr></thead><tbody>';
+    h += '<tr><td>Despachos ('+nS+')</td>' + K.map(function(k){ return '<td class="neg">'+sgn(t[k].des)+'</td>'; }).join('') + '</tr>';
+    h += '<tr><td>Devoluciones ('+nD+')</td>' + K.map(function(k){ return '<td class="neg">'+sgn(t[k].dev)+'</td>'; }).join('') + '</tr>';
+    h += '<tr><td>Entradas ('+nE+')</td>' + K.map(function(k){ return '<td class="pos">'+sgn(t[k].ent)+'</td>'; }).join('') + '</tr>';
+    h += '<tr class="saldo"><td>Saldo</td>' + K.map(function(k){ var s = t[k].sal + t[k].ent; return '<td class="'+(s<0?'neg':'pos')+'">'+sgn(s)+'</td>'; }).join('') + '</tr>';
+    return h + '</tbody></table></div>';
+  }
   function pintarStock(desde, hasta){
-    var t = totalesStock(STOCK_MOVS), nS = 0, nE = 0, nD = 0;
-    STOCK_MOVS.forEach(function(m){ m.tipo==='Salida' ? nS++ : m.tipo==='Devolución' ? nD++ : nE++; });
-    var row = function(lab, k){ var x = t[k]; return '<td>'+lab+'</td>'; };
-    var h = '<div class="guia-card"><table class="stk-tab"><thead><tr><th></th><th>Bins</th><th>Totes</th><th>Tapas</th><th>Esponjas</th></tr></thead><tbody>';
-    h += '<tr><td>Despachos ('+nS+')</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ return '<td class="neg">'+sgn(t[k].des)+'</td>'; }).join('') + '</tr>';
-    h += '<tr><td>Devoluciones ('+nD+')</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ return '<td class="neg">'+sgn(t[k].dev)+'</td>'; }).join('') + '</tr>';
-    h += '<tr><td>Entradas ('+nE+')</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ return '<td class="pos">'+sgn(t[k].ent)+'</td>'; }).join('') + '</tr>';
-    h += '<tr class="saldo"><td>Saldo</td>' + ['bins','totes','tapas','esponjas'].map(function(k){ var s = t[k].sal + t[k].ent; return '<td class="'+(s<0?'neg':'pos')+'">'+sgn(s)+'</td>'; }).join('') + '</tr>';
-    h += '</tbody></table>';
-    h += '<p class="stk-note">Periodo '+fmtFecha(desde)+' al '+fmtFecha(hasta)+'. Las entradas usan lo contado por la encargada en el campo.</p></div>';
+    var h = '';
+    gruposCampo(STOCK_MOVS).forEach(function(g){
+      h += tablaStock(g.movs, (g.sin ? '⚠ ' : '📍 ') + g.nombre, g.sin ? ' stk-sin' : '');
+      if(g.sin) h += '<p class="draft-note" style="margin-top:6px">Registros anteriores sin campo. Ábrelos y edítalos para asignarles uno.</p>';
+    });
+    h += tablaStock(STOCK_MOVS, 'Total fundo', ' stk-total');
+    h += '<p class="draft-note">Periodo '+fmtFecha(desde)+' al '+fmtFecha(hasta)+'. Las entradas usan lo contado por la encargada en el campo.</p>';
     h += '<button class="btn-save" type="button" onclick="descargarExcelStock()"'+(STOCK_MOVS.length?'':' disabled')+'>⬇ Descargar Excel</button>';
     if(!STOCK_MOVS.length) h += '<p class="draft-note">No hay movimientos en este periodo.</p>';
     $('stock-res').innerHTML = h;
@@ -1962,14 +2019,14 @@
   function descargarExcelStock(){
     if(!window.XLSX){ return cargarXLSX(descargarExcelStock); }
     var desde = $('s-desde').value, hasta = $('s-hasta').value;
-    var cab = ['Fecha','Hora','Tipo','Documento','N° guía','Estado guía SII','Patente','Chofer','RUT chofer','Exportadora','Planta',
+    var cab = ['Fecha','Hora','Tipo','Campo','Documento','N° guía','Estado guía SII','Patente','Chofer','RUT chofer','Exportadora','Planta',
                'Especie','Cuartel','Variedad','Bins','Totes','Tapas','Esponjas','Kg aprox.','Bins dañados','Responsable','Cruce chofer/campo','Observaciones'];
     var filas = STOCK_MOVS.map(function(m){
-      return [fmtFecha(m.fecha), fmtHora(m.ts), m.tipo, m.doc, m.guia, m.estado_guia, m.patente, m.chofer, m.rut, m.exportadora, m.planta,
+      return [fmtFecha(m.fecha), fmtHora(m.ts), m.tipo, m.campo || '(sin campo)', m.doc, m.guia, m.estado_guia, m.patente, m.chofer, m.rut, m.exportadora, m.planta,
               m.especie, m.cuartel, m.variedad, m.bins, m.totes, m.tapas, m.esponjas, m.kg, m.danados, m.responsable, m.cruce, m.obs];
     });
     var t = totalesStock(STOCK_MOVS);
-    var tot = function(lab, f){ var r = new Array(cab.length).fill(''); r[0] = lab; ['bins','totes','tapas','esponjas'].forEach(function(k,i){ r[14+i] = f(t[k]); }); return r; };
+    var tot = function(lab, f){ var r = new Array(cab.length).fill(''); r[0] = lab; ['bins','totes','tapas','esponjas'].forEach(function(k,i){ r[15+i] = f(t[k]); }); return r; };
     filas.push(new Array(cab.length).fill(''));
     filas.push(tot('TOTAL DESPACHOS', function(x){ return x.des; }));
     filas.push(tot('TOTAL DEVOLUCIONES', function(x){ return x.dev; }));
@@ -1977,7 +2034,7 @@
     filas.push(tot('SALDO', function(x){ return x.sal + x.ent; }));
 
     var ws = XLSX.utils.aoa_to_sheet([cab].concat(filas));
-    ws['!cols'] = [10,6,8,16,10,12,9,20,13,18,16,10,8,14,7,7,7,9,9,10,18,18,28].map(function(w){ return {wch:w}; });
+    ws['!cols'] = [10,6,8,22,16,10,12,9,20,13,18,16,10,8,14,7,7,7,9,9,10,18,18,28].map(function(w){ return {wch:w}; });
     ws['!autofilter'] = { ref: XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:STOCK_MOVS.length, c:cab.length-1}}) };
 
     // Hoja resumen por exportadora
@@ -1999,8 +2056,22 @@
     ws2['!cols'] = [{wch:24}].concat(new Array(12).fill({wch:12}));
 
     var wb = XLSX.utils.book_new();
+    // Hoja stock por campo
+    var pc = [['Stock por campo · ' + fmtFecha(desde) + ' al ' + fmtFecha(hasta)], [],
+      ['Campo','Concepto','Bins','Totes','Tapas','Esponjas']];
+    gruposCampo(STOCK_MOVS).concat([{nombre:'TOTAL FUNDO', movs:STOCK_MOVS}]).forEach(function(g){
+      var x = totalesStock(g.movs), K = ['bins','totes','tapas','esponjas'];
+      pc.push([g.nombre, 'Despachos'].concat(K.map(function(k){ return x[k].des; })));
+      pc.push(['', 'Devoluciones'].concat(K.map(function(k){ return x[k].dev; })));
+      pc.push(['', 'Entradas'].concat(K.map(function(k){ return x[k].ent; })));
+      pc.push(['', 'SALDO'].concat(K.map(function(k){ return x[k].sal + x[k].ent; })));
+      pc.push([]);
+    });
+    var ws3 = XLSX.utils.aoa_to_sheet(pc);
+    ws3['!cols'] = [{wch:26},{wch:14},{wch:10},{wch:10},{wch:10},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, ws3, 'Stock por campo');
     XLSX.utils.book_append_sheet(wb, ws, 'Movimientos');
-    XLSX.utils.book_append_sheet(wb, ws2, 'Resumen');
+    XLSX.utils.book_append_sheet(wb, ws2, 'Resumen por exportadora');
     var nombre = 'Movimientos_bins_' + desde + '_a_' + hasta + '.xlsx';
     var buf = XLSX.write(wb, {bookType:'xlsx', type:'array'});
     var blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
@@ -2060,7 +2131,7 @@
   function editarDespacho(){
     var d = despachoActual; if(!d) return;
     if(d.estado==='emitida' && !confirm('Esta guía ya fue emitida en el SII (N° '+(d.numero_guia||'')+'). Corregir aquí no cambia la guía emitida. ¿Editar igual?')) return;
-    var m = { 'd-solicitante':d.solicitante, 'd-cuartel':d.cuartel, 'd-especie':d.especie, 'd-variedad':d.variedad,
+    var m = { 'd-campo':d.campo, 'd-solicitante':d.solicitante, 'd-cuartel':d.cuartel, 'd-especie':d.especie, 'd-variedad':d.variedad,
       'd-csg':d.csg, 'd-sdp':d.sdp, 'd-bins':d.bins, 'd-totes':d.totes, 'd-kg':d.kg_aprox, 'd-esponjas':d.esponjas,
       'd-chofer':d.chofer_nombre, 'd-rut':d.chofer_rut, 'd-patente':d.patente, 'd-sello':d.sello,
       'd-planta':d.planta, 'd-exportadora':d.exportadora, 'd-obs':d.observaciones };
@@ -2068,6 +2139,27 @@
     Object.keys(m).forEach(function(id){ $(id).value = m[id]==null ? '' : m[id]; });
     $('d-rut').classList.remove('is-invalid');
     goTo('view-despacho');
+  }
+  // Si se cambia el N° de guía (ej. guía anulada y reemplazada), se cambia también en el registro emparejado
+  // ---- Guías duplicadas ----
+  function esDuplicado(e){ return e && (e.code === '23505' || /duplicate key|unique/i.test(e.message || '')); }
+  function msgGuiaDuplicada(guia, donde){
+    return '⚠ La guía N° ' + guia + ' ya está registrada' + (donde ? ' ' + donde : '') + '.\n\n' +
+           'No se puede registrar dos veces la misma guía. Búscala en Recepción → Cuadratura y, si hay que corregir algo, usa ✏️ Editar.';
+  }
+  // Revisa si ya existe un registro con esa guía (lado 'chofer' o 'campo'), ignorando el que se está editando
+  function guiaYaExiste(lado, guia, excluirId){
+    var col = lado === 'chofer' ? 'chofer_id' : 'campo_id';
+    return sb.from('recepcion_cuadratura').select('chofer_id,campo_id').eq('guia_norm', normGuia(guia)).then(function(r){
+      var d = r.data; if(!Array.isArray(d)) d = d ? [d] : [];
+      return d.some(function(x){ return x[col] && x[col] !== excluirId; });
+    });
+  }
+
+  function sincronizarGuia(tabla, idPareja, guiaAntes, guiaNueva){
+    if(!idPareja || normGuia(guiaAntes) === normGuia(guiaNueva)) return Promise.resolve();
+    return sb.from(tabla).update({ numero_guia: guiaNueva, editado_at: new Date().toISOString() }).eq('id', idPareja)
+      .then(function(r){ if(r.error) alert(esDuplicado(r.error) ? msgGuiaDuplicada(guiaNueva, 'en el otro registro') : 'Se corrigió la guía, pero no se pudo actualizar el registro emparejado: ' + r.error.message); });
   }
   function editarRecepcion(tipo, id){
     if(!sb) return;
@@ -2080,11 +2172,15 @@
               'c-planta':r.planta, 'c-guia':r.numero_guia, 'c-bins':r.bins, 'c-totes':r.totes, 'c-tapas':r.tapas,
               'c-esponjas':r.esponjas, 'c-obs':r.observaciones };
       } else {
-        m = { 'r-encargada':r.encargada, 'r-patente':r.patente, 'r-guia':r.numero_guia, 'r-bins':r.bins, 'r-totes':r.totes,
+        m = { 'r-campo':r.campo, 'r-encargada':r.encargada, 'r-patente':r.patente, 'r-guia':r.numero_guia, 'r-bins':r.bins, 'r-totes':r.totes,
               'r-tapas':r.tapas, 'r-esponjas':r.esponjas, 'r-danados':r.bins_danados, 'r-obs':r.observaciones };
       }
       entrarEdicion(tipo, id);
       Object.keys(m).forEach(function(k){ $(k).value = m[k]==null ? '' : m[k]; });
+      var f = $(EDIT_CFG[tipo].form); f._guiaOrig = r.numero_guia; f._pareja = null;
+      sb.from('recepcion_cuadratura').select('chofer_id,campo_id').eq(tipo==='chofer' ? 'chofer_id' : 'campo_id', id).single().then(function(pr){
+        if(pr && pr.data) f._pareja = tipo==='chofer' ? pr.data.campo_id : pr.data.chofer_id;
+      });
       if(tipo==='chofer'){ fotoChofer = null; $('c-foto-prev').innerHTML=''; mostrarFotoActual('c-foto-prev','c-foto-txt', r.foto_guia_url); $('c-rut').classList.remove('is-invalid'); }
       else { fotoCampo = null; $('r-foto-prev').innerHTML=''; mostrarFotoActual('r-foto-prev','r-foto-txt', r.foto_url); }
       goTo(EDIT_CFG[tipo].vista);
@@ -2095,7 +2191,7 @@
   //  DEVOLUCIÓN DE MATERIAL (sale del campo → se descuenta del stock)
   // =====================================================================
   var fotoDev = null, DEV_CACHE = {};
-  var IDS_DEV = ['v-responsable','v-exportadora','v-planta','v-motivo','v-bins','v-totes','v-tapas','v-esponjas','v-guia','v-patente','v-chofer','v-obs'];
+  var IDS_DEV = ['v-campo','v-responsable','v-exportadora','v-planta','v-motivo','v-bins','v-totes','v-tapas','v-esponjas','v-guia','v-patente','v-chofer','v-obs'];
   EDIT_CFG.dev = { form:'form-dev', h:'h-dev', btn:'btn-dev', cancel:'cancel-dev',
                    titulo:'Material que sale del campo', boton:'Registrar devolución', vista:'view-devolucion' };
 
@@ -2116,6 +2212,7 @@
     var btn = $('btn-dev'); btn.disabled = true; btn.textContent = 'Guardando…';
     subirFoto(fotoDev, 'devolucion').then(function(url){
       var reg = {
+        campo: $('v-campo').value,
         responsable: $('v-responsable').value.trim(),
         exportadora: $('v-exportadora').value.trim(),
         planta: $('v-planta').value.trim() || null,
@@ -2152,7 +2249,7 @@
     h += '<div class="guia-card"><div class="guia-head"><b>Devolución N° '+d.id+'</b><span>'+fmtFecha(d.fecha)+' · '+fmtHora(d.created_at)+'</span></div>';
     h += '<table class="cruce-tab"><thead><tr><th></th><th>Bins</th><th>Totes</th><th>Tapas</th><th>Esponjas</th></tr></thead><tbody>';
     h += '<tr><td>Devuelto</td><td>−'+d.bins+'</td><td>−'+d.totes+'</td><td>−'+d.tapas+'</td><td>−'+d.esponjas+'</td></tr></tbody></table>';
-    h += fila('Responsable', d.responsable) + fila('Exportadora', d.exportadora) + fila('Planta', d.planta) + fila('Motivo', d.motivo) +
+    h += fila('Campo', d.campo) + fila('Responsable', d.responsable) + fila('Exportadora', d.exportadora) + fila('Planta', d.planta) + fila('Motivo', d.motivo) +
          fila('N° guía', d.numero_guia) + fila('Patente', d.patente) + fila('Chofer', d.chofer_nombre) + fila('Obs.', d.observaciones) +
          (d.editado_at ? fila('Corregido', fmtFecha(d.editado_at)+' '+fmtHora(d.editado_at)) : '');
     if(d.foto_url) h += '<a href="'+esc(d.foto_url)+'" target="_blank" rel="noopener"><img class="cruce-foto" src="'+esc(d.foto_url)+'" alt="Foto"></a>';
@@ -2167,7 +2264,7 @@
 
   function editarDevolucion(id){
     var d = DEV_CACHE[id]; if(!d) return;
-    var m = { 'v-responsable':d.responsable, 'v-exportadora':d.exportadora, 'v-planta':d.planta, 'v-motivo':d.motivo,
+    var m = { 'v-campo':d.campo, 'v-responsable':d.responsable, 'v-exportadora':d.exportadora, 'v-planta':d.planta, 'v-motivo':d.motivo,
               'v-bins':d.bins, 'v-totes':d.totes, 'v-tapas':d.tapas, 'v-esponjas':d.esponjas,
               'v-guia':d.numero_guia, 'v-patente':d.patente, 'v-chofer':d.chofer_nombre, 'v-obs':d.observaciones };
     entrarEdicion('dev', id);
