@@ -511,6 +511,16 @@
           </div>
           <div class="field-row">
             <div class="field">
+              <label for="d-bins-vac">Bins vacíos</label>
+              <div class="stepper"><button type="button" onclick="paso('d-bins-vac',-1)">−</button><input type="number" id="d-bins-vac" inputmode="numeric" min="0" value="0"><button type="button" onclick="paso('d-bins-vac',1)">+</button></div>
+            </div>
+            <div class="field">
+              <label for="d-totes-vac">Totes vacíos</label>
+              <div class="stepper"><button type="button" onclick="paso('d-totes-vac',-1)">−</button><input type="number" id="d-totes-vac" inputmode="numeric" min="0" value="0"><button type="button" onclick="paso('d-totes-vac',1)">+</button></div>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
               <label for="d-kg">Kg aprox.</label>
               <input type="number" id="d-kg" inputmode="decimal" min="0">
             </div>
@@ -538,9 +548,15 @@
               <input type="text" id="d-patente" placeholder="ABCD12" style="text-transform:uppercase" required>
             </div>
           </div>
-          <div class="field">
-            <label for="d-sello">N° sello camión</label>
-            <input type="text" id="d-sello">
+          <div class="field-row">
+            <div class="field">
+              <label for="d-patente-carro">Patente carro</label>
+              <input type="text" id="d-patente-carro" placeholder="JK1234" style="text-transform:uppercase">
+            </div>
+            <div class="field">
+              <label for="d-sello">N° sello camión</label>
+              <input type="text" id="d-sello">
+            </div>
           </div>
         </div>
 
@@ -1103,8 +1119,8 @@
   var EXPORTADORAS = [];
 
 
-  var CAMPOS_DESP = ['d-campo','d-solicitante','d-cuartel','d-especie','d-variedad','d-csg','d-sdp','d-bins','d-totes',
-    'd-kg','d-esponjas','d-chofer','d-rut','d-patente','d-sello','d-planta','d-exportadora','d-obs'];
+  var CAMPOS_DESP = ['d-campo','d-solicitante','d-cuartel','d-especie','d-variedad','d-csg','d-sdp','d-bins','d-totes','d-bins-vac','d-totes-vac',
+    'd-kg','d-esponjas','d-chofer','d-rut','d-patente','d-patente-carro','d-sello','d-planta','d-exportadora','d-obs'];
   var BORRADOR_KEY = 'despacho_borrador_v1';
   var RECORDAR = []; // cada despacho se llena completo
   var despachoActual = null;
@@ -1203,7 +1219,8 @@
     if(faltan.length){ alert('Falta completar:\n• ' + faltan.join('\n• ')); return; }
     if(!rutValido($('d-rut').value)){ alert('El RUT del chofer no es válido. Revísalo.'); $('d-rut').focus(); return; }
     var bins = parseInt($('d-bins').value,10)||0, totes = parseInt($('d-totes').value,10)||0;
-    if(bins + totes === 0){ alert('Ingresa la cantidad de bins o totes con fruta.'); return; }
+    var binsVac = parseInt($('d-bins-vac').value,10)||0, totesVac = parseInt($('d-totes-vac').value,10)||0;
+    if(bins + totes + binsVac + totesVac === 0){ alert('Ingresa la cantidad de bins o totes (con fruta o vacíos).'); return; }
     if(!sb){ alert('Sin conexión a la base de datos. Revisa tu internet e intenta de nuevo; lo escrito no se pierde.'); return; }
 
     var reg = {
@@ -1214,9 +1231,11 @@
       cuartel: $('d-cuartel').value.trim().toUpperCase(),
       variedad: $('d-variedad').value.trim(),
       bins: bins, totes: totes,
+      bins_vacios: binsVac, totes_vacios: totesVac,
       csg: $('d-csg').value.trim() || null,
       sdp: $('d-sdp').value.trim() || null,
       patente: $('d-patente').value.trim().toUpperCase().replace(/[\s.-]/g,''),
+      patente_carro: $('d-patente-carro').value.trim().toUpperCase().replace(/[\s.-]/g,'') || null,
       chofer_nombre: $('d-chofer').value.trim(),
       chofer_rut: formatearRut($('d-rut').value),
       planta: $('d-planta').value.trim(),
@@ -1262,10 +1281,11 @@
       fila('CSG', d.csg) + fila('SDP', d.sdp) +
       '<p class="guia-sec">Carga</p>' +
       fila('Bins con fruta', fmtNum(d.bins)) + fila('Totes con fruta', fmtNum(d.totes)) +
+      (d.bins_vacios ? fila('Bins vacíos', fmtNum(d.bins_vacios)) : '') + (d.totes_vacios ? fila('Totes vacíos', fmtNum(d.totes_vacios)) : '') +
       fila('Kg aprox.', d.kg_aprox==null ? '' : fmtNum(d.kg_aprox)) + fila('Esponjas', fmtNum(d.esponjas)) +
       '<p class="guia-sec">Transporte</p>' +
       fila('Chofer', d.chofer_nombre) + fila('RUT chofer', d.chofer_rut) +
-      fila('Patente', d.patente) + fila('N° sello', d.sello) +
+      fila('Patente camión', d.patente) + fila('Patente carro', d.patente_carro) + fila('N° sello', d.sello) +
       '<p class="guia-sec">Destino</p>' +
       fila('Planta', d.planta) + fila('Exportadora', d.exportadora) + fila('Observaciones', d.observaciones);
     $('d-nguia').value = d.numero_guia || '';
@@ -1306,12 +1326,13 @@
     L.push('');
     L.push('*Carga*');
     L.push('Bins con fruta: ' + d.bins + ' · Totes con fruta: ' + d.totes);
+    if(d.bins_vacios || d.totes_vacios) L.push('Bins vacíos: ' + (d.bins_vacios||0) + ' · Totes vacíos: ' + (d.totes_vacios||0));
     if(d.kg_aprox != null) L.push('Kg aprox.: ' + fmtNum(d.kg_aprox));
     L.push('Esponjas: ' + d.esponjas);
     L.push('');
     L.push('*Transporte*');
     L.push('Chofer: ' + d.chofer_nombre + ' · RUT ' + d.chofer_rut);
-    L.push('Patente: ' + d.patente + (d.sello ? ' · Sello N° ' + d.sello : ''));
+    L.push('Patente camión: ' + d.patente + (d.patente_carro ? ' · Patente carro: ' + d.patente_carro : '') + (d.sello ? ' · Sello N° ' + d.sello : ''));
     L.push('');
     L.push('*Destino*');
     L.push('Planta: ' + d.planta);
@@ -1401,8 +1422,9 @@
     L.push('Fundo Lo Ovalle · Solicitud N° ' + d.id + ' · ' + fmtFecha(d.fecha));
     L.push('');
     L.push(d.especie + ' · ' + d.variedad + ' · Cuartel ' + d.cuartel);
+    if(d.bins_vacios || d.totes_vacios) L.push('Vacíos: ' + (d.bins_vacios||0) + ' bins · ' + (d.totes_vacios||0) + ' totes');
     L.push('Bins: ' + d.bins + ' · Totes: ' + d.totes + (d.kg_aprox != null ? ' · Kg aprox.: ' + fmtNum(d.kg_aprox) : ''));
-    L.push('Chofer: ' + d.chofer_nombre + ' · Patente ' + d.patente + (d.sello ? ' · Sello ' + d.sello : ''));
+    L.push('Chofer: ' + d.chofer_nombre + ' · Patente ' + d.patente + (d.patente_carro ? ' / carro ' + d.patente_carro : '') + (d.sello ? ' · Sello ' + d.sello : ''));
     L.push('Destino: ' + d.planta + ' · ' + d.exportadora);
     if(d.guia_archivo_url){ L.push(''); L.push('📄 Guía: ' + d.guia_archivo_url); }
     return L.join('\n');
@@ -1508,6 +1530,7 @@
       el.value = formatearRut(el.value); el.classList.toggle('is-invalid', !rutValido(el.value)); guardarBorrador();
     });
     $('d-patente').addEventListener('input', function(){ this.value = this.value.toUpperCase(); });
+    $('d-patente-carro').addEventListener('input', function(){ this.value = this.value.toUpperCase(); });
     actualizarPendientes();
     document.addEventListener('visibilitychange', function(){ if(!document.hidden) actualizarPendientes(); });
   })();
@@ -1927,7 +1950,7 @@
     if(!desde || !hasta || desde > hasta){ alert('Revisa las fechas del periodo.'); return; }
     if(!sb){ $('stock-res').innerHTML = '<p class="hoy-empty">Sin conexión.</p>'; return; }
     $('stock-res').innerHTML = '<p class="hoy-empty">Cargando…</p>';
-    var cols = 'id,campo,created_at,fecha,solicitante,especie,cuartel,variedad,bins,totes,esponjas,kg_aprox,patente,chofer_nombre,chofer_rut,planta,exportadora,sello,estado,numero_guia,observaciones';
+    var cols = 'id,campo,created_at,fecha,solicitante,especie,cuartel,variedad,bins,totes,bins_vacios,totes_vacios,esponjas,kg_aprox,patente,patente_carro,chofer_nombre,chofer_rut,planta,exportadora,sello,estado,numero_guia,observaciones';
     Promise.all([
       sb.from('despachos_bins').select(cols).gte('fecha', desde).lte('fecha', hasta).order('created_at').limit(5000),
       sb.from('recepcion_cuadratura').select('*').not('campo_id','is',null).gte('campo_fecha', desde).lte('campo_fecha', hasta).order('campo_at').limit(5000),
@@ -1938,10 +1961,11 @@
       (r[0].data||[]).forEach(function(d){
         movs.push({ campo:d.campo||'', ts:d.created_at, fecha:d.fecha, tipo:'Salida', doc:'Solicitud N° '+d.id, guia:d.numero_guia||'',
           estado_guia: d.estado==='emitida' ? 'Emitida' : 'Pendiente',
-          patente:d.patente, chofer:d.chofer_nombre, rut:d.chofer_rut, exportadora:d.exportadora, planta:d.planta,
+          patente:d.patente + (d.patente_carro ? ' / ' + d.patente_carro : ''), chofer:d.chofer_nombre, rut:d.chofer_rut, exportadora:d.exportadora, planta:d.planta,
           especie:d.especie, cuartel:d.cuartel, variedad:d.variedad,
-          bins:-(d.bins||0), totes:-(d.totes||0), tapas:0, esponjas:-(d.esponjas||0), kg:d.kg_aprox==null?'':Number(d.kg_aprox),
-          danados:'', responsable:d.solicitante, cruce:'', obs:d.observaciones||'' });
+          bins:-((d.bins||0)+(d.bins_vacios||0)), totes:-((d.totes||0)+(d.totes_vacios||0)), tapas:0, esponjas:-(d.esponjas||0), kg:d.kg_aprox==null?'':Number(d.kg_aprox),
+          danados:'', responsable:d.solicitante, cruce:'',
+          obs:[(d.bins_vacios||d.totes_vacios) ? 'Incluye vacíos: '+(d.bins_vacios||0)+' bins / '+(d.totes_vacios||0)+' totes' : '', d.observaciones||''].filter(Boolean).join(' · ') });
       });
       var CRUCE = {cuadrado:'Cuadrado', descuadre:'Descuadre', sin_chofer:'Sin registro chofer', en_camino:'En camino'};
       (r[1].data||[]).forEach(function(c){
@@ -2132,8 +2156,8 @@
     var d = despachoActual; if(!d) return;
     if(d.estado==='emitida' && !confirm('Esta guía ya fue emitida en el SII (N° '+(d.numero_guia||'')+'). Corregir aquí no cambia la guía emitida. ¿Editar igual?')) return;
     var m = { 'd-campo':d.campo, 'd-solicitante':d.solicitante, 'd-cuartel':d.cuartel, 'd-especie':d.especie, 'd-variedad':d.variedad,
-      'd-csg':d.csg, 'd-sdp':d.sdp, 'd-bins':d.bins, 'd-totes':d.totes, 'd-kg':d.kg_aprox, 'd-esponjas':d.esponjas,
-      'd-chofer':d.chofer_nombre, 'd-rut':d.chofer_rut, 'd-patente':d.patente, 'd-sello':d.sello,
+      'd-csg':d.csg, 'd-sdp':d.sdp, 'd-bins':d.bins, 'd-totes':d.totes, 'd-bins-vac':d.bins_vacios||0, 'd-totes-vac':d.totes_vacios||0, 'd-kg':d.kg_aprox, 'd-esponjas':d.esponjas,
+      'd-chofer':d.chofer_nombre, 'd-rut':d.chofer_rut, 'd-patente':d.patente, 'd-patente-carro':d.patente_carro, 'd-sello':d.sello,
       'd-planta':d.planta, 'd-exportadora':d.exportadora, 'd-obs':d.observaciones };
     entrarEdicion('desp', d.id);
     Object.keys(m).forEach(function(id){ $(id).value = m[id]==null ? '' : m[id]; });
